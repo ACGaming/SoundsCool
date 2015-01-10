@@ -1,26 +1,24 @@
 package com.dynious.soundscool.tileentity;
 
-import com.dynious.soundscool.SoundsCool;
-import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.helper.SoundHelper;
-import com.dynious.soundscool.network.packet.client.SoundPlayerSelectPacket;
-import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
-import com.dynious.soundscool.network.packet.server.StopSoundPacket;
-import com.dynious.soundscool.sound.Sound;
-import cpw.mods.fml.common.network.FMLOutboundHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
+import java.util.UUID;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-import java.util.UUID;
+import com.dynious.soundscool.SoundsCool;
+import com.dynious.soundscool.handler.SoundHandler;
+import com.dynious.soundscool.helper.NetworkHelper;
+import com.dynious.soundscool.helper.SoundHelper;
+import com.dynious.soundscool.network.packet.client.SoundPlayerSelectPacket;
+import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
+import com.dynious.soundscool.network.packet.server.StopSoundPacket;
+import com.dynious.soundscool.sound.Sound;
+
+import cpw.mods.fml.common.network.FMLOutboundHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 public class TileSoundPlayer extends TileEntity
 {
@@ -59,6 +57,7 @@ public class TileSoundPlayer extends TileEntity
 
     public void playCurrentSound()
     {
+    	NetworkHelper.syncAllPlayerSounds();
         if (selectedSound != null)
         {
             if (timeSoundFinishedPlaying < System.currentTimeMillis())
