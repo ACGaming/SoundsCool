@@ -58,7 +58,7 @@ public class SoundUploadedPacket implements IPacket
         }
         else
         {
-            EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(category);
+            EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(category);
             if (player != null)
             {
                 NetworkHelper.sendPacketToPlayer(new SoundReceivedPacket(SoundHandler.getSound(soundName)), player);
