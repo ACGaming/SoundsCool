@@ -2,10 +2,12 @@ package com.dynious.soundscool.client.gui;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
+import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
 import com.dynious.soundscool.network.packet.client.SoundPlayerPlayPacket;
 import com.dynious.soundscool.sound.Sound;
 import com.dynious.soundscool.tileentity.TileSoundPlayer;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+
 import org.apache.commons.io.FileUtils;
 
 @SideOnly(Side.CLIENT)
@@ -25,7 +28,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public GuiSoundPlayer(TileSoundPlayer tile)
     {
         this.tile = tile;
-        SoundsCool.proxy.getChannel().writeOutbound(new GetUploadedSoundsPacket(Minecraft.getMinecraft().thePlayer));
+        NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);
     }
 
     @SuppressWarnings("unchecked")
@@ -77,7 +80,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 case 1:
                     if (tile.getSelectedSound() != null)
                     {
-                        SoundsCool.proxy.getChannel().writeOutbound(new SoundPlayerPlayPacket(tile));
+                    	SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
                     }
                     break;
             }

@@ -1,14 +1,16 @@
 package com.dynious.soundscool.command;
 
-import com.dynious.soundscool.helper.NetworkHelper;
-import com.dynious.soundscool.lib.Commands;
-import com.dynious.soundscool.network.packet.server.OpenGUIPacket;
+import java.util.List;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.util.List;
+import com.dynious.soundscool.helper.NetworkHelper;
+import com.dynious.soundscool.lib.Commands;
+import com.dynious.soundscool.network.packet.server.OpenGUIPacket;
 
 public class CommandSoundsCool extends CommandBase
 {
@@ -36,7 +38,7 @@ public class CommandSoundsCool extends CommandBase
     {
         if (commandSender instanceof EntityPlayer)
         {
-            NetworkHelper.sendPacketToPlayer(new OpenGUIPacket(0), (EntityPlayer) commandSender);
+            NetworkHelper.sendMessageToPlayer(new OpenGUIPacket(0), (EntityPlayerMP) commandSender);
         }
     }
 

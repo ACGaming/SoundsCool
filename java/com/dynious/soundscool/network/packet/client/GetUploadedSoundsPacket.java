@@ -1,14 +1,18 @@
 package com.dynious.soundscool.network.packet.client;
 
-import com.dynious.soundscool.helper.NetworkHelper;
-import com.dynious.soundscool.network.packet.IPacket;
-import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.DimensionManager;
 
-public class GetUploadedSoundsPacket implements IPacket
+import com.dynious.soundscool.helper.NetworkHelper;
+import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+
+public class GetUploadedSoundsPacket implements IMessage
 {
     int entityID;
     int worldID;
@@ -24,22 +28,29 @@ public class GetUploadedSoundsPacket implements IPacket
     }
 
     @Override
-    public void readBytes(ByteBuf bytes)
+    public void fromBytes(ByteBuf bytes)
     {
         entityID = bytes.readInt();
         worldID = bytes.readInt();
 
-        Entity entity = DimensionManager.getProvider(worldID).worldObj.getEntityByID(entityID);
+        Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
         if (entity != null && entity instanceof EntityPlayer)
         {
-            NetworkHelper.sendPacketToPlayer(new UploadedSoundsPacket(), (EntityPlayer) entity);
+            NetworkHelper.sendMessageToAll(new UploadedSoundsPacket());
         }
     }
 
     @Override
-    public void writeBytes(ByteBuf bytes)
+    public void toBytes(ByteBuf bytes)
     {
         bytes.writeInt(entityID);
         bytes.writeInt(worldID);
+    }
+    
+    public static class Handler implements IMessageHandler<GetUploadedSoundsPacket, IMessage> {
+        @Override
+        public IMessage onMessage(GetUploadedSoundsPacket message, MessageContext ctx) {
+            return null;
+        }
     }
 }
