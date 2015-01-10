@@ -17,9 +17,6 @@ import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.sound.Sound;
 
-import cpw.mods.fml.common.network.FMLOutboundHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-
 public class TileSoundPlayer extends TileEntity
 {
     private boolean isPowered = false;
@@ -46,7 +43,7 @@ public class TileSoundPlayer extends TileEntity
 
         if (this.getWorldObj().isRemote)
         {
-            SoundsCool.proxy.getChannel().writeOutbound(new SoundPlayerSelectPacket(this));
+        	SoundsCool.network.sendToServer(new SoundPlayerSelectPacket(this));
         }
     }
 
@@ -65,10 +62,8 @@ public class TileSoundPlayer extends TileEntity
                 if (SoundHandler.getSound(selectedSound.getSoundName()) != null)
                 {
                     lastSoundIdentifier = UUID.randomUUID().toString();
-                    SoundsCool.proxy.getChannel().attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
-                    SoundsCool.proxy.getChannel().attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
-                    SoundsCool.proxy.getChannel().writeOutbound(new ServerPlaySoundPacket(selectedSound.getSoundName(), lastSoundIdentifier, xCoord, yCoord, zCoord));
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
+                    NetworkHelper.sendMessageToAll(new ServerPlaySoundPacket(selectedSound.getSoundName(), lastSoundIdentifier, xCoord, yCoord, zCoord));
                 }
                 else
                 {
@@ -86,9 +81,7 @@ public class TileSoundPlayer extends TileEntity
     {
         if (System.currentTimeMillis() < timeSoundFinishedPlaying)
         {
-            SoundsCool.proxy.getChannel().attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
-            SoundsCool.proxy.getChannel().attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
-            SoundsCool.proxy.getChannel().writeOutbound(new StopSoundPacket(lastSoundIdentifier));
+            NetworkHelper.sendMessageToAll(new StopSoundPacket(lastSoundIdentifier));
             timeSoundFinishedPlaying = 0;
         }
     }

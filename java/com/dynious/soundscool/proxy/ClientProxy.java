@@ -34,10 +34,4 @@ public class ClientProxy extends CommonProxy
             e.printStackTrace();
         }
     }
-
-    @Override
-    public EmbeddedChannel getChannel()
-    {
-        return channels.get(Side.CLIENT);
-    }
 }

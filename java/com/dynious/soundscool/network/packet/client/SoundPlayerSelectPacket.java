@@ -1,13 +1,17 @@
 package com.dynious.soundscool.network.packet.client;
 
-import com.dynious.soundscool.network.packet.IPacket;
-import com.dynious.soundscool.tileentity.TileSoundPlayer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
-public class SoundPlayerSelectPacket implements IPacket
+import com.dynious.soundscool.tileentity.TileSoundPlayer;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+
+public class SoundPlayerSelectPacket implements IMessage
 {
     int dimensionId;
     int x, y, z;
@@ -26,7 +30,7 @@ public class SoundPlayerSelectPacket implements IPacket
     }
 
     @Override
-    public void readBytes(ByteBuf bytes)
+    public void fromBytes(ByteBuf bytes)
     {
         dimensionId = bytes.readInt();
         x = bytes.readInt();
@@ -53,7 +57,7 @@ public class SoundPlayerSelectPacket implements IPacket
     }
 
     @Override
-    public void writeBytes(ByteBuf bytes)
+    public void toBytes(ByteBuf bytes)
     {
         bytes.writeInt(dimensionId);
         bytes.writeInt(x);
@@ -64,6 +68,13 @@ public class SoundPlayerSelectPacket implements IPacket
         for (char c : soundName.toCharArray())
         {
             bytes.writeChar(c);
+        }
+    }
+    
+    public static class Handler implements IMessageHandler<SoundPlayerSelectPacket, IMessage> {
+        @Override
+        public IMessage onMessage(SoundPlayerSelectPacket message, MessageContext ctx) {
+            return null;
         }
     }
 }

@@ -95,7 +95,7 @@ public class SoundHandler
             sounds.remove(sound);
             if (FMLCommonHandler.instance().getEffectiveSide().isServer())
             {
-                NetworkHelper.sendPacketToAll(new SoundRemovedPacket(sound.getSoundName()));
+                NetworkHelper.sendMessageToAll(new SoundRemovedPacket(sound.getSoundName()));
             }
         }
     }
@@ -174,7 +174,7 @@ public class SoundHandler
         {
             sound.setState(Sound.SoundState.DOWNLOADING);
             DelayedPlayHandler.addDelayedPlay(soundName, identifier, x, y, z);
-            SoundsCool.proxy.getChannel().writeOutbound(new CheckPresencePacket(soundName, Minecraft.getMinecraft().thePlayer));
+            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, Minecraft.getMinecraft().thePlayer));
         }
     }
     @SideOnly(Side.CLIENT)

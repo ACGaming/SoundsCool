@@ -47,7 +47,7 @@ public class GuiSounds extends GuiScreen implements IListGui
             }
         };
         fileChooser.setFileFilter(new FileNameExtensionFilter("Sound Files (.ogg, .wav, .mp3)", "ogg", "wav", "mp3"));
-        SoundsCool.proxy.getChannel().writeOutbound(new GetUploadedSoundsPacket(player));
+        NetworkHelper.syncPlayerSounds(player);
     }
 
     @SuppressWarnings("unchecked")
@@ -157,7 +157,7 @@ public class GuiSounds extends GuiScreen implements IListGui
                         }
                         else
                         {
-                            SoundsCool.proxy.getChannel().writeOutbound(new RemoveSoundPacket(selectedSound.getSoundName()));
+                        	SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName()));
                             SoundHandler.removeSound(selectedSound);
                             selectSoundIndex(-1);
                         }

@@ -1,10 +1,14 @@
 package com.dynious.soundscool.network.packet.server;
 
-import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.network.packet.IPacket;
 import io.netty.buffer.ByteBuf;
 
-public class ServerPlaySoundPacket implements IPacket
+import com.dynious.soundscool.handler.SoundHandler;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+
+public class ServerPlaySoundPacket implements IMessage
 {
     String soundName, identifier;
     int x, y, z;
@@ -22,9 +26,9 @@ public class ServerPlaySoundPacket implements IPacket
     }
 
     @Override
-    public void readBytes(ByteBuf bytes)
+    public void fromBytes(ByteBuf bytes)
     {
-        int soundLength = bytes.readInt();
+    	int soundLength = bytes.readInt();
         char[] fileCars = new char[soundLength];
         for (int i = 0; i < soundLength; i++)
         {
@@ -45,7 +49,7 @@ public class ServerPlaySoundPacket implements IPacket
     }
 
     @Override
-    public void writeBytes(ByteBuf bytes)
+    public void toBytes(ByteBuf bytes)
     {
         bytes.writeInt(soundName.length());
         for (char c : soundName.toCharArray())
@@ -60,5 +64,12 @@ public class ServerPlaySoundPacket implements IPacket
         bytes.writeInt(x);
         bytes.writeInt(y);
         bytes.writeInt(z);
+    }
+    
+    public static class Handler implements IMessageHandler<ServerPlaySoundPacket, IMessage> {
+        @Override
+        public IMessage onMessage(ServerPlaySoundPacket message, MessageContext ctx) {
+            return null;
+        }
     }
 }
