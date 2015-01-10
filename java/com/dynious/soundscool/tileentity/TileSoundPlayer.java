@@ -17,6 +17,8 @@ import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.sound.Sound;
 
+import cpw.mods.fml.common.network.NetworkRegistry;
+
 public class TileSoundPlayer extends TileEntity
 {
     private boolean isPowered = false;
@@ -63,7 +65,9 @@ public class TileSoundPlayer extends TileEntity
                 {
                     lastSoundIdentifier = UUID.randomUUID().toString();
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-                    NetworkHelper.sendMessageToAll(new ServerPlaySoundPacket(selectedSound.getSoundName(), lastSoundIdentifier, xCoord, yCoord, zCoord));
+                    SoundsCool.network.sendToAllAround(
+                    		new ServerPlaySoundPacket(selectedSound.getSoundName(), lastSoundIdentifier, xCoord, yCoord, zCoord),
+                    		new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
                 }
                 else
                 {
@@ -81,7 +85,8 @@ public class TileSoundPlayer extends TileEntity
     {
         if (System.currentTimeMillis() < timeSoundFinishedPlaying)
         {
-            NetworkHelper.sendMessageToAll(new StopSoundPacket(lastSoundIdentifier));
+           SoundsCool.network.sendToAllAround(new StopSoundPacket(lastSoundIdentifier),
+           		new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
             timeSoundFinishedPlaying = 0;
         }
     }

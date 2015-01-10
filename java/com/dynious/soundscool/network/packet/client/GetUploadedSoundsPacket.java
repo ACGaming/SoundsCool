@@ -3,9 +3,10 @@ package com.dynious.soundscool.network.packet.client;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.DimensionManager;
 
-import com.dynious.soundscool.helper.NetworkHelper;
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -36,7 +37,7 @@ public class GetUploadedSoundsPacket implements IMessage
         Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
         if (entity != null && entity instanceof EntityPlayer)
         {
-            NetworkHelper.sendMessageToAll(new UploadedSoundsPacket());
+            SoundsCool.network.sendTo(new UploadedSoundsPacket(), (EntityPlayerMP) entity);
         }
     }
 
