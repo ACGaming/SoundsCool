@@ -8,7 +8,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import com.dynious.soundscool.helper.NetworkHelper;
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.lib.Commands;
 import com.dynious.soundscool.network.packet.server.OpenGUIPacket;
 
@@ -38,7 +38,7 @@ public class CommandSoundsCool extends CommandBase
     {
         if (commandSender instanceof EntityPlayer)
         {
-            NetworkHelper.sendMessageToPlayer(new OpenGUIPacket(0), (EntityPlayerMP) commandSender);
+            SoundsCool.network.sendTo(new OpenGUIPacket(0), (EntityPlayerMP) commandSender);
         }
     }
 

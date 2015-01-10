@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.DelayedPlayHandler;
 import com.dynious.soundscool.handler.NetworkHandler;
 import com.dynious.soundscool.handler.SoundHandler;
@@ -67,7 +68,7 @@ public class SoundUploadedPacket implements IMessage
             EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(category);
             if (player != null)
             {
-                NetworkHelper.sendMessageToPlayer(new SoundReceivedPacket(SoundHandler.getSound(soundName)), player);
+                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName)), player);
             }
         }
     }

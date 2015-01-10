@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.DimensionManager;
 
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
@@ -56,7 +57,7 @@ public class CheckPresencePacket implements IMessage
             }
             else
             {
-                NetworkHelper.sendMessageToPlayer(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
+                SoundsCool.network.sendTo(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
             }
         }
     }
