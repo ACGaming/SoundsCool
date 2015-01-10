@@ -5,7 +5,9 @@ import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.network.packet.IPacket;
 import com.dynious.soundscool.network.packet.SoundChunkPacket;
 import com.dynious.soundscool.network.packet.SoundUploadedPacket;
+import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 import com.dynious.soundscool.sound.Sound;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -13,6 +15,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -34,6 +37,11 @@ public class NetworkHelper
     {
         SoundsCool.proxy.getChannel().attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALL);
         SoundsCool.proxy.getChannel().writeOutbound(packet);
+    }
+    
+    public static void syncAllPlayerSounds()
+    {
+    	sendPacketToAll(new UploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)
