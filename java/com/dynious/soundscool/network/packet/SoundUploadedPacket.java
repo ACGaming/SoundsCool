@@ -46,7 +46,7 @@ public class SoundUploadedPacket implements IMessage
         category = String.valueOf(catCars);
         if (FMLCommonHandler.instance().getEffectiveSide().isClient() && (category.equalsIgnoreCase("null") || category.isEmpty()))
         {
-            category = Minecraft.getMinecraft().getCurrentServerData().serverName;
+            category = Minecraft.getMinecraft().getCurrentServerData().serverIP;
         }
 
         int fileLength = bytes.readInt();
