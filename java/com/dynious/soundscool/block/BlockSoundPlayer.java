@@ -22,6 +22,7 @@ public class BlockSoundPlayer extends BlockContainer
     public BlockSoundPlayer()
     {
         super(Material.rock);
+        this.setHardness(2F);
         this.setCreativeTab(SoundsCool.tabSoundsCool);
         this.setBlockName(Names.soundPlayer);
     }
