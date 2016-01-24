@@ -60,7 +60,7 @@ public class NetworkHelper
     public static void clientSoundUpload(Sound sound)
     {
         sound.setState(Sound.SoundState.UPLOADING);
-        uploadSound(sound, Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedTextForChat());
+        uploadSound(sound, Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText());
     }
 
     public static void serverSoundUpload(Sound sound, EntityPlayerMP player)
