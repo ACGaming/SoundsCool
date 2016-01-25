@@ -1,6 +1,7 @@
 package com.dynious.soundscool.client.audio;
 
 import com.dynious.soundscool.handler.SoundHandler;
+
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -9,14 +10,17 @@ import net.minecraft.client.audio.SoundManager;
 import paulscode.sound.SoundSystem;
 
 import javax.sound.sampled.AudioInputStream;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 @SideOnly(Side.CLIENT)
 public class SoundPlayer
 {
     private static SoundSystem soundSystem;
+    private static ArrayList<String> playing = new ArrayList<String>();
 
     private static void init()
     {
@@ -34,6 +38,7 @@ public class SoundPlayer
         {
             soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
             soundSystem.play(identifier);
+            playing.add(identifier);
         }
         catch (MalformedURLException e)
         {
@@ -44,5 +49,40 @@ public class SoundPlayer
     public static void stopSound(String identifier)
     {
         soundSystem.stop(identifier);
+        playing.remove(identifier);
     }
+    
+    public static void stopSounds()
+    {
+    	if(soundSystem!=null)
+    	{
+    		for(String s : playing)
+			{
+				soundSystem.stop(s);
+			}
+    	}
+    	playing = new ArrayList<String>();
+    }
+    
+    public static void pauseSounds()
+	{
+		if(soundSystem != null)
+		{
+			for(String s : playing)
+			{
+				soundSystem.pause(s);
+			}
+		}
+	}
+    
+    public static void resumeSounds()
+	{
+		if(soundSystem != null)
+		{
+			for(String s : playing)
+			{
+				soundSystem.play(s);
+			}
+		}
+	}
 }
