@@ -16,13 +16,13 @@ import com.dynious.soundscool.network.packet.server.OpenGUIPacket;
 public class CommandSoundsCool extends CommandBase
 {
     @Override
-    public String getName()
+    public String getCommandName()
     {
         return Commands.SOUNDS;
     }
 
     @Override
-    public boolean canCommandSenderUse(ICommandSender commandSender)
+    public boolean canCommandSenderUseCommand(ICommandSender commandSender)
     {
         return true;
     }
@@ -35,7 +35,7 @@ public class CommandSoundsCool extends CommandBase
     }
 
     @Override
-    public void execute(ICommandSender commandSender, String[] args)
+    public void processCommand(ICommandSender commandSender, String[] args)
     {
         if (commandSender instanceof EntityPlayer)
         {
@@ -47,18 +47,5 @@ public class CommandSoundsCool extends CommandBase
     public String getCommandUsage(ICommandSender icommandsender)
     {
         return null;
-    }
-
-    @Override
-    public int compareTo(Object obj)
-    {
-        if (obj instanceof ICommand)
-        {
-            return this.compareTo((ICommand) obj);
-        }
-        else
-        {
-            return 0;
-        }
     }
 }
