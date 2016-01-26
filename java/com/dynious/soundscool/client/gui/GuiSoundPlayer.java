@@ -22,7 +22,7 @@ import com.dynious.soundscool.tileentity.TileSoundPlayer;
 @SideOnly(Side.CLIENT)
 public class GuiSoundPlayer extends GuiScreen implements IListGui
 {
-    private GuiRemoteSoundsList soundsList;
+    private GuiSoundsList soundsList;
     private TileSoundPlayer tile;
     private GuiButton playButton;
 
@@ -38,7 +38,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public void initGui()
     {
         super.initGui();
-        soundsList = new GuiRemoteSoundsList(this, 150);
+        soundsList = new GuiSoundsList(this, 150);
         this.buttonList.add(new GuiButton(0, getWidth() / 2, getHeight() - 42, I18n.format("gui.done")));
         this.buttonList.add(playButton = new GuiButton(1, getWidth() / 2, getHeight() - 72, "Play/Stop"));
         onSelectedSoundChanged();
@@ -108,9 +108,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void selectSoundIndex(int selected)
     {
-        if (selected >= 0 && selected < SoundHandler.getRemoteSounds().size())
+        if (selected >= 0 && selected < SoundHandler.getSounds().size())
         {
-            tile.selectSound(SoundHandler.getRemoteSounds().get(selected).getSoundName());
+            tile.selectSound(SoundHandler.getSounds().get(selected).getSoundName());
             onSelectedSoundChanged();
         }
     }
@@ -119,7 +119,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public boolean soundIndexSelected(int var1)
     {
         Sound sound = tile.getSelectedSound();
-        return sound != null && SoundHandler.getRemoteSounds().indexOf(sound) == var1;
+        return sound != null && SoundHandler.getSounds().indexOf(sound) == var1;
     }
 
     @Override
