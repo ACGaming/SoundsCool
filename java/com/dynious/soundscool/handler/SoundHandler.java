@@ -177,7 +177,7 @@ public class SoundHandler
         }
         else
         {
-            SoundHandler.addRemoteSound(soundName, Minecraft.getMinecraft().getCurrentServerData().serverIP);
+            SoundHandler.addRemoteSound(soundName, Minecraft.getMinecraft().getCurrentServerData().serverIP.replace(':', '-'));
             sound = SoundHandler.getSound(soundName);
         }
 
@@ -194,8 +194,7 @@ public class SoundHandler
         File category;
         if (Minecraft.getMinecraft().getCurrentServerData() != null)
         {
-            //TODO: make this not return null, dammit MC!
-            category = new File("sounds" + File.separator + Minecraft.getMinecraft().getCurrentServerData().serverIP);
+            category = new File("sounds" + File.separator + Minecraft.getMinecraft().getCurrentServerData().serverIP.replace(':', '-'));
         }
         else
         {

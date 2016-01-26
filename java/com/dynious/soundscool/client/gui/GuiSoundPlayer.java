@@ -30,6 +30,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     {
         this.tile = tile;
         NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);
+        SoundHandler.findSounds();
     }
 
     @SuppressWarnings("unchecked")
