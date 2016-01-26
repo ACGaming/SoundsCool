@@ -51,7 +51,7 @@ public class NetworkHelper
             byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
             SoundsCool.network.sendTo(new SoundChunkPacket(sound.getSoundName(), bytes), player);
         }
-        SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), MinecraftServer.getServer().getMOTD()), player);
+        SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), ""), player);
     }
 
     private static void uploadSound(Sound sound, String category)
