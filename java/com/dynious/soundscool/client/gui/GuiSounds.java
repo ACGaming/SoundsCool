@@ -8,16 +8,21 @@ import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
 import com.dynious.soundscool.network.packet.client.RemoveSoundPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.Sound.SoundState;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.util.UUID;
 
@@ -163,18 +168,42 @@ public class GuiSounds extends GuiScreen implements IListGui
                 case 3:
                     if (selectedSound != null)
                     {
-                        if (selectedSound.getState() == Sound.SoundState.LOCAL_ONLY)
-                        {
-                            Sound sound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                            NetworkHelper.clientSoundUpload(sound);
-                            selectSoundIndex(-1);
-                        }
-                        else
-                        {
-                        	SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName()));
-                            SoundHandler.removeSound(selectedSound);
-                            selectSoundIndex(-1);
-                        }
+                    	if(Minecraft.getMinecraft().func_147104_D() != null)
+                    	{
+                    		if (selectedSound.getState() == Sound.SoundState.LOCAL_ONLY)
+                    		{
+                    			if(SoundHandler.getLocalSounds().contains(selectedSound))
+                    			{
+                    				NetworkHelper.clientSoundUpload(selectedSound);
+                    			}
+                    			else
+                    			{
+                    				NetworkHelper.clientSoundUpload(SoundHandler.setupSound(selectedSound.getSoundLocation()));
+                    			}
+                    			
+                            	selectSoundIndex(-1);
+                    		}
+                    		else
+                    		{
+                    			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName()));
+                    			SoundHandler.removeSound(selectedSound);
+                    			selectSoundIndex(-1);
+                    		}
+                    	}
+                    	else
+                    	{
+                    		if(!SoundHandler.getLocalSounds().contains(selectedSound))
+                    		{
+                    			Sound sound = SoundHandler.setupSound(selectedSound.getSoundLocation());
+                    			SoundHandler.addLocalSound(sound.getSoundName(), sound.getSoundLocation());
+                    			selectSoundIndex(-1);
+                    		}
+                    		else
+                    		{
+                    			selectSoundIndex(-1);
+                    			//delete
+                    		}
+                    	}
                     }
                     break;
             }
@@ -185,16 +214,31 @@ public class GuiSounds extends GuiScreen implements IListGui
     {
         if (selectedSound != null)
         {
-            if (selectedSound.hasRemote())
-            {
-                uploadButton.displayString = "Remove";
-                uploadButton.enabled = selectedSound.getRemoteCategory().equals(player.getDisplayName());
-            }
-            else
-            {
-                uploadButton.displayString = "Upload";
-                uploadButton.enabled = true;
-            }
+        	if(Minecraft.getMinecraft().func_147104_D() != null)
+        	{
+        		if (selectedSound.hasRemote())
+        		{
+        			uploadButton.displayString = "Remove";
+        			uploadButton.enabled = selectedSound.getRemoteCategory().equals(player.getDisplayName());
+        		}
+        		else
+        		{
+        			uploadButton.displayString = "Upload";
+        			uploadButton.enabled = true;
+        		}
+        	}
+        	else
+        	{
+        		if (selectedSound.getState()==SoundState.SYNCED)
+        		{
+        			uploadButton.displayString = "Remove";
+        		}
+        		else
+        		{
+        			uploadButton.displayString = "Save";
+        		}
+        		uploadButton.enabled = true;
+        	}
             playButton.enabled = true;
         }
         else
