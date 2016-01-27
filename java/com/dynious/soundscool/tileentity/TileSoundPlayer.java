@@ -79,7 +79,7 @@ public class TileSoundPlayer extends TileEntity
 
     public void stopCurrentSound()
     {
-        if (System.currentTimeMillis() < timeSoundFinishedPlaying)
+        if (selectedSound != null && System.currentTimeMillis() < timeSoundFinishedPlaying)
         {
             NetworkHelper.sendMessageToAll(new StopSoundPacket(lastSoundIdentifier));
             timeSoundFinishedPlaying = 0;
@@ -106,13 +106,14 @@ public class TileSoundPlayer extends TileEntity
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        String soundName = pkt.getNbtCompound().getString("selected");
+        String soundName = pkt.func_148857_g().getString("selectedSound");
         this.selectedSound = SoundHandler.getSound(soundName);
     }
 
     @Override
     public Packet getDescriptionPacket()
     {
+    	NetworkHelper.syncAllPlayerSounds();
         NBTTagCompound compound = new NBTTagCompound();
         if (selectedSound != null)
         {

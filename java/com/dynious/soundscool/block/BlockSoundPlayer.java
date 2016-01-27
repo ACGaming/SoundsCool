@@ -50,7 +50,9 @@ public class BlockSoundPlayer extends Block implements ITileEntityProvider
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null && tile instanceof TileSoundPlayer)
             {
-                player.openGui(SoundsCool.instance, 1, world, pos.getX(), pos.getY(), pos.getZ());
+            	world.markBlockForUpdate(pos);
+            	tile.markDirty();
+            	player.openGui(SoundsCool.instance, 1, world, pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;
