@@ -94,6 +94,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void drawScreen(int p_571_1_, int p_571_2_, float p_571_3_)
     {
+    	if(selectedSound != tile.getSelectedSound())
+    		onSelectedSoundChanged();
         this.soundsList.drawScreen(p_571_1_, p_571_2_, p_571_3_);
         super.drawScreen(p_571_1_, p_571_2_, p_571_3_);
 
