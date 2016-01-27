@@ -28,11 +28,13 @@ public class NetworkHelper
     
     public static void syncPlayerSounds(EntityPlayer player)
     {
+    	SoundHandler.findSounds();
     	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket(player));
     }
     
     public static void syncAllPlayerSounds()
     {
+    	SoundHandler.findSounds();
     	SoundsCool.network.sendToAll(new UploadedSoundsPacket());
     }
 

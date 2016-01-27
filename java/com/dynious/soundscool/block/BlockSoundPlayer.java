@@ -48,6 +48,8 @@ public class BlockSoundPlayer extends BlockContainer
             TileEntity tile = world.getTileEntity(x, y, z);
             if (tile != null && tile instanceof TileSoundPlayer)
             {
+            	world.markBlockForUpdate(x, y, z);
+            	tile.markDirty();
                 player.openGui(SoundsCool.instance, 1, world, x, y, z);
             }
         }
