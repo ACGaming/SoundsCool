@@ -12,6 +12,6 @@ public class ClientConnectionHandler
 	@SubscribeEvent
 	public void disconnect(ClientDisconnectionFromServerEvent event)
 	{
-		SoundPlayer.stopSounds();
+		SoundPlayer.getInstance().stopSounds();
 	}
 }

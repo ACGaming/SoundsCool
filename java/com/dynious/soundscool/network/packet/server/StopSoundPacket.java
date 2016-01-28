@@ -31,7 +31,7 @@ public class StopSoundPacket implements IMessage
         }
         identifier = String.valueOf(fileCars);
 
-        SoundPlayer.stopSound(identifier);
+        SoundPlayer.getInstance().stopSound(identifier);
     }
 
     @Override
