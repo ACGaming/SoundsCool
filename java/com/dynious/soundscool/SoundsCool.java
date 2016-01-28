@@ -3,7 +3,6 @@ package com.dynious.soundscool;
 import net.minecraft.creativetab.CreativeTabs;
 
 import com.dynious.soundscool.block.ModBlocks;
-import com.dynious.soundscool.command.CommandSoundsCool;
 import com.dynious.soundscool.creativetab.CreativeTabSoundsCool;
 import com.dynious.soundscool.handler.GuiHandler;
 import com.dynious.soundscool.handler.SoundHandler;
@@ -16,7 +15,6 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
@@ -54,11 +52,5 @@ public class SoundsCool
         proxy.initTileEntities();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
-    }
-
-    @EventHandler
-    public void serverStarting(FMLServerStartingEvent event)
-    {
-        event.registerServerCommand(new CommandSoundsCool());
     }
 }
