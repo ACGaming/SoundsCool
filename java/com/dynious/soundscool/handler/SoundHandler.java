@@ -8,6 +8,7 @@ import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.sound.Sound;
 import com.google.common.io.Files;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -16,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class SoundHandler
 {
@@ -63,13 +65,16 @@ public class SoundHandler
 
     public static Sound getSound(String fileName)
     {
-        for (Sound sound : getSounds())
-        {
-            if(sound.getSoundName().equals(fileName))
+    	Iterator<Sound> iter = sounds.iterator();
+
+    	while (iter.hasNext()) {
+    	    Sound sound = iter.next();
+
+    	    if(sound.getSoundName().equals(fileName))
             {
                 return sound;
             }
-        }
+    	}
         return null;
     }
 

@@ -17,7 +17,9 @@ import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.sound.Sound;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 public class TileSoundPlayer extends TileEntity
 {
@@ -59,7 +61,7 @@ public class TileSoundPlayer extends TileEntity
     	NetworkHelper.syncAllPlayerSounds();
         if (selectedSound != null)
         {
-            if (timeSoundFinishedPlaying < System.currentTimeMillis())
+            if (!isPlaying())
             {
                 if (SoundHandler.getSound(selectedSound.getSoundName()) != null)
                 {
@@ -83,12 +85,17 @@ public class TileSoundPlayer extends TileEntity
 
     public void stopCurrentSound()
     {
-        if (selectedSound != null && System.currentTimeMillis() < timeSoundFinishedPlaying)
+        if (selectedSound != null && isPlaying())
         {
            SoundsCool.network.sendToAllAround(new StopSoundPacket(lastSoundIdentifier),
            		new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
             timeSoundFinishedPlaying = 0;
         }
+    }
+    
+    public boolean isPlaying()
+    {
+    	return System.currentTimeMillis() < timeSoundFinishedPlaying;
     }
 
     @Override
@@ -119,6 +126,8 @@ public class TileSoundPlayer extends TileEntity
     {
         String soundName = pkt.func_148857_g().getString("selectedSound");
         this.selectedSound = SoundHandler.getSound(soundName);
+        Long timeSoundFinishedPlaying = pkt.func_148857_g().getLong("timeSoundFinishedPlaying");
+        this.timeSoundFinishedPlaying = timeSoundFinishedPlaying;
     }
 
     @Override
@@ -129,6 +138,7 @@ public class TileSoundPlayer extends TileEntity
         if (selectedSound != null)
         {
             compound.setString("selectedSound", selectedSound.getSoundName());
+            compound.setLong("timeSoundFinishedPlaying", timeSoundFinishedPlaying);
         }
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, compound);
     }
