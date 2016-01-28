@@ -122,7 +122,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
                 this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 150, 0xFFFFFF);
             }
-            System.out.println(tile.isPlaying());
             if(tile.isPlaying() || System.currentTimeMillis() < timeSoundFinishedPlaying)
             {
             	playButton.displayString="Stop Sound";
@@ -300,7 +299,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         if (selected >= 0 && selected < SoundHandler.getSounds().size())
         {
         	selectedSound = SoundHandler.getSounds().get(selected);
-        	System.out.println(mc.isIntegratedServerRunning());
         	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
         		tile.selectSound(selectedSound.getSoundName());
             onSelectedSoundChanged();
