@@ -187,9 +187,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			}
                     			else
                     			{
-                    				Sound sound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    				selectedSound = sound;
-                    				NetworkHelper.clientSoundUpload(sound);
+                    				selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
+                    				NetworkHelper.clientSoundUpload(selectedSound);
                     			}
                     			tile.selectSound(selectedSound.getSoundName());
                     			onSelectedSoundChanged();
@@ -206,9 +205,12 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     	{
                     		if(!SoundHandler.getLocalSounds().contains(selectedSound))
                     		{
-                    			Sound sound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    			SoundHandler.addLocalSound(sound.getSoundName(), sound.getSoundLocation());
-                    			selectSoundIndex(-1);
+                    			selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
+                    			SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getSoundLocation());
+
+                    			tile.selectSound(selectedSound.getSoundName());
+                    			onSelectedSoundChanged();
+                            	selectSoundIndex(-1);
                     		}
                     		else
                     		{
