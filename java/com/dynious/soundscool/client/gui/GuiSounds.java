@@ -219,7 +219,7 @@ public class GuiSounds extends GuiScreen implements IListGui
         		if (selectedSound.hasRemote())
         		{
         			uploadButton.displayString = "Remove";
-        			uploadButton.enabled = selectedSound.getRemoteCategory().equals(player.getDisplayName().getUnformattedText());
+        			uploadButton.enabled = selectedSound.getCategory().equals(player.getDisplayName().getUnformattedText());
         		}
         		else
         		{

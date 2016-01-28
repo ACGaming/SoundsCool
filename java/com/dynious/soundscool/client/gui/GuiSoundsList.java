@@ -52,16 +52,7 @@ public class GuiSoundsList extends GuiScrollingList
         if (sound != null)
         {
             this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.getSoundName(), listWidth - 10), this.left + 3 , var3 + 2, 0xFFFFFF);
-            String category;
-            if(sound.hasRemote())
-            {
-            	category = sound.getRemoteCategory();
-            }
-            else
-            {
-            	category = sound.getCategory();
-            }
-            this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(category, listWidth - 10), this.left + 3 , var3 + 12, 0xCCCCCC);
+            this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.getCategory(), listWidth - 10), this.left + 3 , var3 + 12, 0xCCCCCC);
         }
     }
 }
