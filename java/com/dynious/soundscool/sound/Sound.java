@@ -7,7 +7,6 @@ public class Sound
     private File soundLocation;
     private String soundName;
     private String category;
-    private String remoteCategory;
     private SoundState state;
 
     public Sound(File soundLocation)
@@ -27,18 +26,13 @@ public class Sound
     {
         this.soundLocation = null;
         this.soundName = soundName;
-        this.remoteCategory = category;
+        this.category = category;
         this.state = SoundState.REMOTE_ONLY;
     }
 
     public String getCategory()
     {
         return category;
-    }
-
-    public String getRemoteCategory()
-    {
-        return remoteCategory;
     }
 
     public String getSoundName()
@@ -58,7 +52,6 @@ public class Sound
 
     public void onSoundUploaded(String remoteCategory)
     {
-        this.remoteCategory = remoteCategory;
         this.state = SoundState.SYNCED;
     }
 
