@@ -1,12 +1,13 @@
 package com.dynious.soundscool.handler;
 
-import com.dynious.soundscool.client.gui.GuiSoundPlayer;
-import com.dynious.soundscool.client.gui.GuiSounds;
-import com.dynious.soundscool.tileentity.TileSoundPlayer;
-import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import com.dynious.soundscool.client.gui.GuiSoundPlayer;
+import com.dynious.soundscool.tileentity.TileSoundPlayer;
+
+import cpw.mods.fml.common.network.IGuiHandler;
 
 public class GuiHandler implements IGuiHandler
 {
@@ -25,8 +26,6 @@ public class GuiHandler implements IGuiHandler
     {
         switch(ID)
         {
-            case 0:
-                return new GuiSounds(player);
             case 1:
                 TileEntity tile = world.getTileEntity(x, y, z);
                 if (tile != null && tile instanceof TileSoundPlayer)
