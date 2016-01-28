@@ -52,6 +52,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     private UUID currentlyPlayerSoundId;
     private long timeSoundFinishedPlaying;
     private Sound selectedSound;
+    private int selected = -1;
 
     public GuiSoundPlayer(TileSoundPlayer tile)
     {
@@ -105,20 +106,24 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void drawScreen(int p_571_1_, int p_571_2_, float p_571_3_)
     {
-    	if(selectedSound != tile.getSelectedSound())
-    		onSelectedSoundChanged();
         this.soundsList.drawScreen(p_571_1_, p_571_2_, p_571_3_);
         super.drawScreen(p_571_1_, p_571_2_, p_571_3_);
 
         if (selectedSound != null)
         {
+        	if(selectedSound.getState() == SoundState.UPLOADING)
+        		uploadButton.enabled = false;
+        	Sound tileSound = tile.getSelectedSound();
+        	if((!selectedSound.equals(tileSound) && selectedSound.hasRemote()) || (selectedSound.equals(tileSound) && selectedSound.getState()!=tileSound.getState() && tileSound.hasRemote()))
+        	{
+        		selectedSound = tile.getSelectedSound();
+        		onSelectedSoundChanged();
+        	}
+        	
             this.getFontRenderer().drawString(selectedSound.getSoundName(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(selectedSound.getSoundName())/2), 30, 0xFFFFFF);
 
-            String downloaded = selectedSound.hasLocal()? "Downloaded": "Not downloaded";
-            this.getFontRenderer().drawString(downloaded, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded)/2), 60, selectedSound.hasLocal()? 0x00FF00: 0xFF0000);
-            
-            String uploaded = selectedSound.hasRemote()? "Uploaded": "Not uploaded";
-            this.getFontRenderer().drawString(uploaded, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(uploaded)/2), 90, selectedSound.hasRemote()? 0x00FF00: 0xFF0000);
+            SoundState downloaded = selectedSound.getState();
+            this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
 
             String category = selectedSound.getCategory();
             this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 120, 0xFFFFFF);
@@ -193,9 +198,12 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			}
                     			else
                     			{
-                    				NetworkHelper.clientSoundUpload(SoundHandler.setupSound(selectedSound.getSoundLocation()));
+                    				Sound sound = SoundHandler.setupSound(selectedSound.getSoundLocation());
+                    				selectedSound = sound;
+                    				NetworkHelper.clientSoundUpload(sound);
                     			}
-                    			
+                    			tile.selectSound(selectedSound.getSoundName());
+                    			onSelectedSoundChanged();
                             	selectSoundIndex(-1);
                     		}
                     		else
@@ -226,8 +234,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
 
     public void onSelectedSoundChanged()
     {
-    	selectedSound = tile.getSelectedSound();
-    	
+    	System.out.println("change");
+    	selected = SoundHandler.getSounds().indexOf(selectedSound);
     	if(selectedSound != null)
     	{
     		playButton.enabled = true;
@@ -274,10 +282,13 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void selectSoundIndex(int selected)
     {
+    	this.selected = selected;
         if (selected >= 0 && selected < SoundHandler.getSounds().size())
         {
-            tile.selectSound(SoundHandler.getSounds().get(selected).getSoundName());
-            //selectedSound = tile.getSelectedSound();
+        	selectedSound = SoundHandler.getSounds().get(selected);
+        	System.out.println(mc.isIntegratedServerRunning());
+        	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
+        		tile.selectSound(selectedSound.getSoundName());
             onSelectedSoundChanged();
         }
     }
@@ -285,8 +296,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public boolean soundIndexSelected(int var1)
     {
-        Sound sound = tile.getSelectedSound();
-        return sound != null && SoundHandler.getSounds().indexOf(sound) == var1;
+        return selected == var1;
     }
 
     @Override
