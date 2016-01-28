@@ -16,12 +16,12 @@ public class TickHandler
 	{
 		if(paused == false && Minecraft.getMinecraft().isGamePaused())
 		{
-			SoundPlayer.pauseSounds();
+			SoundPlayer.getInstance().pauseSounds();
 			paused = true;
 		}
 		if(paused == true && !Minecraft.getMinecraft().isGamePaused())
 		{
-			SoundPlayer.resumeSounds();
+			SoundPlayer.getInstance().resumeSounds();
 			paused = false;
 		}
 	}

@@ -175,7 +175,7 @@ public class SoundHandler
         {
             if (sound.hasLocal())
             {
-                SoundPlayer.playSound(sound.getSoundLocation(), identifier, x, y, z, true);
+                SoundPlayer.getInstance().playSound(sound.getSoundLocation(), identifier, x, y, z, true);
                 return;
             }
         }

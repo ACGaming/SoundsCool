@@ -270,7 +270,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	{
     		currentlyPlayerSoundId = UUID.randomUUID();
     		timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-    		SoundPlayer.playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
+    		SoundPlayer.getInstance().playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
     	}
     	playButton.displayString = "Stop Sound";
     }
@@ -284,7 +284,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	else if(System.currentTimeMillis() < timeSoundFinishedPlaying)
     	{
     		timeSoundFinishedPlaying = 0;
-    		SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
+    		SoundPlayer.getInstance().stopSound(currentlyPlayerSoundId.toString());
     	}
     	playButton.displayString = "Play Sound";
     }
@@ -349,7 +349,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     {
         if (System.currentTimeMillis() < timeSoundFinishedPlaying)
         {
-            SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
+            SoundPlayer.getInstance().stopSound(currentlyPlayerSoundId.toString());
         }
     }
 }
