@@ -20,8 +20,6 @@ import com.dynious.soundscool.sound.Sound;
 import com.dynious.soundscool.sound.Sound.SoundState;
 import com.dynious.soundscool.tileentity.TileSoundPlayer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -133,6 +131,15 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
                 this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 150, 0xFFFFFF);
             }
+            System.out.println(tile.isPlaying());
+            if(tile.isPlaying() || System.currentTimeMillis() < timeSoundFinishedPlaying)
+            {
+            	playButton.displayString="Stop Sound";
+            }
+            else
+            {
+            	playButton.displayString="Play Sound";
+            }
         }
     }
 
@@ -147,17 +154,10 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     this.mc.setIngameFocus();
                     break;
                 case 1:
-                    if (tile.getSelectedSound().equals(selectedSound))
-                    {
-                    	SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
-                    }
-                    else if (selectedSound != null)
-                    {
-                        if (System.currentTimeMillis() > timeSoundFinishedPlaying)
-                            playSound();
-                        else
-                            stopSound();
-                    }
+                	if(playButton.displayString.equals("Play Sound"))
+                		playSound();
+                	else
+                		stopSound();
                     break;
                 case 2:
                 	if (Minecraft.getMinecraft().isFullScreen())
@@ -227,7 +227,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
 
     public void onSelectedSoundChanged()
     {
-    	stopSound();
+    	if(selected != -1)
+    		stopSound();
     	selected = SoundHandler.getSounds().indexOf(selectedSound);
     	if(selectedSound != null)
     	{
@@ -262,17 +263,31 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     
     private void playSound()
     {
-    	currentlyPlayerSoundId = UUID.randomUUID();
-        timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-        SoundPlayer.playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
-        playButton.displayString = "Stop Sound";
+    	if(selectedSound.equals(tile.getSelectedSound()))
+    	{
+    		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));	
+    	}
+    	else if(selectedSound != null)
+    	{
+    		currentlyPlayerSoundId = UUID.randomUUID();
+    		timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
+    		SoundPlayer.playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
+    	}
+    	playButton.displayString = "Stop Sound";
     }
     
     private void stopSound()
     {
-    	timeSoundFinishedPlaying = 0;
-        playButton.displayString = "Play Sound";
-        SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
+    	if(tile.isPlaying())
+    	{
+    		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
+    	}
+    	else if(System.currentTimeMillis() < timeSoundFinishedPlaying)
+    	{
+    		timeSoundFinishedPlaying = 0;
+    		SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
+    	}
+    	playButton.displayString = "Play Sound";
     }
 
     @Override

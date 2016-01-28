@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class SoundHandler
 {
@@ -64,13 +65,16 @@ public class SoundHandler
 
     public static Sound getSound(String fileName)
     {
-        for (Sound sound : getSounds())
-        {
-            if(sound.getSoundName().equals(fileName))
+    	Iterator<Sound> iter = sounds.iterator();
+
+    	while (iter.hasNext()) {
+    	    Sound sound = iter.next();
+
+    	    if(sound.getSoundName().equals(fileName))
             {
                 return sound;
             }
-        }
+    	}
         return null;
     }
 

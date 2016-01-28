@@ -57,7 +57,7 @@ public class TileSoundPlayer extends TileEntity
     	NetworkHelper.syncAllPlayerSounds();
         if (selectedSound != null)
         {
-            if (timeSoundFinishedPlaying < System.currentTimeMillis())
+            if (!isPlaying())
             {
                 if (SoundHandler.getSound(selectedSound.getSoundName()) != null)
                 {
@@ -79,11 +79,16 @@ public class TileSoundPlayer extends TileEntity
 
     public void stopCurrentSound()
     {
-        if (selectedSound != null && System.currentTimeMillis() < timeSoundFinishedPlaying)
+        if (selectedSound != null && isPlaying())
         {
             NetworkHelper.sendMessageToAll(new StopSoundPacket(lastSoundIdentifier));
             timeSoundFinishedPlaying = 0;
         }
+    }
+    
+    public boolean isPlaying()
+    {
+    	return System.currentTimeMillis() < timeSoundFinishedPlaying;
     }
 
     @Override
@@ -106,8 +111,10 @@ public class TileSoundPlayer extends TileEntity
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        String soundName = pkt.func_148857_g().getString("selectedSound");
+        String soundName = pkt.getNbtCompound().getString("selectedSound");
         this.selectedSound = SoundHandler.getSound(soundName);
+        Long timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
+        this.timeSoundFinishedPlaying = timeSoundFinishedPlaying;
     }
 
     @Override
@@ -118,6 +125,7 @@ public class TileSoundPlayer extends TileEntity
         if (selectedSound != null)
         {
             compound.setString("selectedSound", selectedSound.getSoundName());
+            compound.setLong("timeSoundFinishedPlaying", timeSoundFinishedPlaying);
         }
         return new S35PacketUpdateTileEntity(pos, 1, compound);
     }

@@ -1,5 +1,7 @@
 package com.dynious.soundscool.client.gui;
 
+import java.util.ArrayList;
+
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.sound.Sound;
 import net.minecraftforge.fml.client.GuiScrollingList;
@@ -48,6 +50,10 @@ public class GuiSoundsList extends GuiScrollingList
     @Override
     protected void drawSlot(int listIndex, int var2, int var3, int var4, Tessellator var5)
     {
+    	ArrayList<Sound> sounds = SoundHandler.getSounds();
+    	
+    	if(sounds.size() < listIndex)
+    		return;
         Sound sound = SoundHandler.getSounds().get(listIndex);
         if (sound != null)
         {
