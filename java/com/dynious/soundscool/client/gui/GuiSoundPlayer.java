@@ -136,25 +136,16 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     this.mc.setIngameFocus();
                     break;
                 case 1:
-                    if (tile.getSelectedSound() != null)
+                    if (tile.getSelectedSound().equals(selectedSound))
                     {
                     	SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
                     }
                     else if (selectedSound != null)
                     {
                         if (System.currentTimeMillis() > timeSoundFinishedPlaying)
-                        {
-                            currentlyPlayerSoundId = UUID.randomUUID();
-                            timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-                            SoundPlayer.playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
-                            playButton.displayString = "Stop Sound";
-                        }
+                            playSound();
                         else
-                        {
-                            timeSoundFinishedPlaying = 0;
-                            playButton.displayString = "Play Sound";
-                            SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
-                        }
+                            stopSound();
                     }
                     break;
                 case 2:
@@ -225,7 +216,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
 
     public void onSelectedSoundChanged()
     {
-    	System.out.println("change");
+    	stopSound();
     	selected = SoundHandler.getSounds().indexOf(selectedSound);
     	if(selectedSound != null)
     	{
@@ -256,6 +247,21 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     			uploadButton.enabled = true;
     		}
     	}
+    }
+    
+    private void playSound()
+    {
+    	currentlyPlayerSoundId = UUID.randomUUID();
+        timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
+        SoundPlayer.playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
+        playButton.displayString = "Stop Sound";
+    }
+    
+    private void stopSound()
+    {
+    	timeSoundFinishedPlaying = 0;
+        playButton.displayString = "Play Sound";
+        SoundPlayer.stopSound(currentlyPlayerSoundId.toString());
     }
 
     @Override
