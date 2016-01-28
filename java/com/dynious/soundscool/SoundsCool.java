@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 import com.dynious.soundscool.block.ModBlocks;
-import com.dynious.soundscool.command.CommandSoundsCool;
 import com.dynious.soundscool.creativetab.CreativeTabSoundsCool;
 import com.dynious.soundscool.handler.GuiHandler;
 import com.dynious.soundscool.handler.SoundHandler;
@@ -69,11 +68,5 @@ public class SoundsCool
         proxy.initTileEntities();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
-    }
-
-    @EventHandler
-    public void serverStarting(FMLServerStartingEvent event)
-    {
-        event.registerServerCommand(new CommandSoundsCool());
     }
 }
