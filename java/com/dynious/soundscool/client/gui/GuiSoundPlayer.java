@@ -90,6 +90,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         this.buttonList.add(new GuiButton(0, getWidth() / 2, getHeight() - 32, I18n.format("gui.done")));
         this.buttonList.add(playButton = new GuiButton(1, getWidth() / 2, getHeight() - 57, "Play Sound"));
         
+        playButton.enabled = false;
+        
         GuiButton fileButton = new GuiButton(2, 10, getHeight() - 32, 150, 20, "Select File");
         this.buttonList.add(fileButton);
         if (fileChooser == null)
