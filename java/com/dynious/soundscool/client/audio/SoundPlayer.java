@@ -46,8 +46,11 @@ public class SoundPlayer
 
     public void stopSound(String identifier)
     {
-    	soundSystem.stop(identifier);
-    	playing.remove(identifier);
+    	if(soundSystem.playing(identifier))
+    	{
+    		soundSystem.stop(identifier);
+    		playing.remove(identifier);
+    	}
     }
     
     public void stopSounds()
