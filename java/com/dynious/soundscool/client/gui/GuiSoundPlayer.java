@@ -192,8 +192,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     				NetworkHelper.clientSoundUpload(selectedSound);
                     			}
                     			tile.selectSound(selectedSound.getSoundName());
+                    			selectSoundIndex(-1);
                     			onSelectedSoundChanged();
-                            	selectSoundIndex(-1);
+                    			stopSound();
                     		}
                     		else
                     		{
@@ -212,6 +213,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			tile.selectSound(selectedSound.getSoundName());
                     			onSelectedSoundChanged();
                             	selectSoundIndex(-1);
+                            	stopSound();
                     		}
                     		else
                     		{
