@@ -10,15 +10,16 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class ServerPlaySoundPacket implements IMessage
 {
-    String soundName, identifier;
+    String soundName, category, identifier;
     int x, y, z;
     public ServerPlaySoundPacket()
     {
     }
 
-    public ServerPlaySoundPacket(String soundName, String identifier, int x, int y, int z)
+    public ServerPlaySoundPacket(String soundName, String category, String identifier, int x, int y, int z)
     {
         this.soundName = soundName;
+        this.category = category;
         this.identifier = identifier;
         this.x = x;
         this.y = y;
@@ -35,6 +36,15 @@ public class ServerPlaySoundPacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         soundName = String.valueOf(fileCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
+        
         int identLength = bytes.readInt();
         char[] identCars = new char[identLength];
         for (int i = 0; i < identLength; i++)
@@ -42,10 +52,11 @@ public class ServerPlaySoundPacket implements IMessage
             identCars[i] = bytes.readChar();
         }
         identifier = String.valueOf(identCars);
+        
         x = bytes.readInt();
         y = bytes.readInt();
         z = bytes.readInt();
-        SoundHandler.playSound(soundName, identifier, x, y, z);
+        SoundHandler.playSound(soundName, category, identifier, x, y, z);
     }
 
     @Override
@@ -56,6 +67,13 @@ public class ServerPlaySoundPacket implements IMessage
         {
             bytes.writeChar(c);
         }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
         bytes.writeInt(identifier.length());
         for (char c : identifier.toCharArray())
         {

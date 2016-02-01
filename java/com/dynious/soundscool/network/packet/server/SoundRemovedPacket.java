@@ -11,15 +11,16 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class SoundRemovedPacket implements IMessage
 {
-    String soundName;
+    String soundName, category;
 
     public SoundRemovedPacket()
     {
     }
 
-    public SoundRemovedPacket(String soundName)
+    public SoundRemovedPacket(String soundName, String category)
     {
         this.soundName = soundName;
+        this.category = category;
     }
 
     @Override
@@ -32,8 +33,16 @@ public class SoundRemovedPacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         soundName = String.valueOf(fileCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
 
-        Sound sound = SoundHandler.getSound(soundName);
+        Sound sound = SoundHandler.getSound(soundName, category);
         if (sound != null)
         {
             SoundHandler.remoteRemovedSound(sound);
@@ -45,6 +54,12 @@ public class SoundRemovedPacket implements IMessage
     {
         bytes.writeInt(soundName.length());
         for (char c : soundName.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
         {
             bytes.writeChar(c);
         }

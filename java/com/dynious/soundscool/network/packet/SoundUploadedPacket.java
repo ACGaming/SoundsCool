@@ -44,10 +44,6 @@ public class SoundUploadedPacket implements IMessage
             catCars[i] = bytes.readChar();
         }
         category = String.valueOf(catCars);
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient() && (category.equalsIgnoreCase("null") || category.isEmpty()))
-        {
-            category = Minecraft.getMinecraft().func_147104_D().serverIP.replace(':', '-');
-        }
 
         int fileLength = bytes.readInt();
         char[] fileCars = new char[fileLength];
@@ -58,17 +54,17 @@ public class SoundUploadedPacket implements IMessage
         soundName = String.valueOf(fileCars);
 
         File soundFile = NetworkHelper.createFileFromByteArr(NetworkHandler.soundUploaded(soundName), category, soundName);
-        SoundHandler.addLocalSound(soundName, soundFile);
+        SoundHandler.addLocalSound(soundName, category, soundFile);
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            DelayedPlayHandler.onSoundReceived(soundName);
+            DelayedPlayHandler.onSoundReceived(soundName, category);
         }
         else
         {
             EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(category);
             if (player != null)
             {
-                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName)), player);
+                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName, category)), player);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.dynious.soundscool.handler;
 
+import com.dynious.soundscool.sound.SoundInfo;
 import com.dynious.soundscool.sound.SoundPlayInfo;
 
 import java.util.HashMap;
@@ -7,19 +8,19 @@ import java.util.Map;
 
 public class DelayedPlayHandler
 {
-    private static Map<String, SoundPlayInfo> map = new HashMap<String, SoundPlayInfo>();
+    private static Map<SoundInfo, SoundPlayInfo> map = new HashMap<SoundInfo, SoundPlayInfo>();
 
-    public static void addDelayedPlay(String soundName, String identifier, int x, int y, int z)
+    public static void addDelayedPlay(String soundName, String category, String identifier, int x, int y, int z)
     {
-        map.put(soundName, new SoundPlayInfo(identifier, x, y, z));
+        map.put(new SoundInfo(soundName, category), new SoundPlayInfo(identifier, x, y, z));
     }
 
-    public static void onSoundReceived(String soundName)
+    public static void onSoundReceived(String soundName, String category)
     {
-        SoundPlayInfo info = map.get(soundName);
+        SoundPlayInfo info = map.get(new SoundInfo(soundName, category));
         if (info != null)
         {
-            SoundHandler.playSound(soundName,info.identifier, info.x, info.y, info.z);
+            SoundHandler.playSound(soundName, category, info.identifier, info.x, info.y, info.z);
             map.remove(soundName);
         }
     }

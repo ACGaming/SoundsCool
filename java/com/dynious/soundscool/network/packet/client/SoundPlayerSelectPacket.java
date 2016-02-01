@@ -15,7 +15,7 @@ public class SoundPlayerSelectPacket implements IMessage
 {
     int dimensionId;
     int x, y, z;
-    String soundName;
+    String soundName, category;
     public SoundPlayerSelectPacket()
     {
     }
@@ -27,6 +27,7 @@ public class SoundPlayerSelectPacket implements IMessage
         this.y = tile.yCoord;
         this.z = tile.zCoord;
         this.soundName = tile.getSelectedSound().getSoundName();
+        this.category = tile.getSelectedSound().getCategory();
     }
 
     @Override
@@ -45,13 +46,21 @@ public class SoundPlayerSelectPacket implements IMessage
             soundNameCars[i] = bytes.readChar();
         }
         soundName = String.valueOf(soundNameCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
 
         if (world != null)
         {
             TileEntity tile = world.getTileEntity(x, y, z);
             if (tile != null && tile instanceof TileSoundPlayer)
             {
-                ((TileSoundPlayer)tile).selectSound(soundName);
+                ((TileSoundPlayer)tile).selectSound(soundName, category);
                 world.markBlockForUpdate(x, y, z);
                 tile.markDirty();
             }
@@ -68,6 +77,12 @@ public class SoundPlayerSelectPacket implements IMessage
 
         bytes.writeInt(soundName.length());
         for (char c : soundName.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
         {
             bytes.writeChar(c);
         }
