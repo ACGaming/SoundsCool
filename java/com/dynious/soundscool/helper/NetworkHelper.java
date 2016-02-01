@@ -49,23 +49,29 @@ public class NetworkHelper
     public static void serverSoundUpload(Sound sound, EntityPlayerMP player)
     {
         byte[] soundBytes = convertFileToByteArr(sound.getSoundLocation());
-        for (int i = 0; i < soundBytes.length; i += PARTITION_SIZE)
+        if(soundBytes != null)
         {
-            byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
-            SoundsCool.network.sendTo(new SoundChunkPacket(sound.getSoundName(), bytes), player);
+        	for (int i = 0; i < soundBytes.length; i += PARTITION_SIZE)
+        	{
+        		byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
+        		SoundsCool.network.sendTo(new SoundChunkPacket(sound.getSoundName(), bytes), player);
+        	}
+        	SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory()), player);
         }
-        SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory()), player);
     }
 
     private static void uploadSound(Sound sound, String category)
     {
         byte[] soundBytes = convertFileToByteArr(sound.getSoundLocation());
-        for (int i = 0; i < soundBytes.length; i += PARTITION_SIZE)
+        if(soundBytes != null)
         {
-            byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
-            SoundsCool.network.sendToServer(new SoundChunkPacket(sound.getSoundName(), bytes));
+        	for (int i = 0; i < soundBytes.length; i += PARTITION_SIZE)
+        	{
+        		byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
+        		SoundsCool.network.sendToServer(new SoundChunkPacket(sound.getSoundName(), bytes));
+        	}
+        	SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), category));
         }
-        SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), category));
     }
 
     public static byte[] convertFileToByteArr(File file)
