@@ -171,6 +171,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     }
                     if (fcReturn == JFileChooser.APPROVE_OPTION)
                     {
+                    	stopSound();
                         selectSoundIndex(-1);
                         selectedSound = new Sound(fileChooser.getSelectedFile());
                         onSelectedSoundChanged();
