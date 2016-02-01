@@ -141,6 +141,14 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             {
             	playButton.displayString="Play Sound";
             }
+            if(selectedSound.getState().equals(SoundState.DOWNLOADING) || selectedSound.getState().equals(SoundState.UPLOADING))
+            {
+				playButton.enabled = false;
+            }
+			else
+			{
+				playButton.enabled = true;
+			}
         }
     }
 
