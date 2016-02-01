@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
+import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.SoundChunkPacket;
 import com.dynious.soundscool.network.packet.SoundUploadedPacket;
 import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
@@ -62,7 +63,7 @@ public class NetworkHelper
     public static void clientSoundUpload(Sound sound)
     {
         sound.setState(Sound.SoundState.UPLOADING);
-        uploadSound(sound, Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText());
+        uploadSound(sound, sound.getCategory());
     }
 
     public static void serverSoundUpload(Sound sound, EntityPlayerMP player)
@@ -73,7 +74,7 @@ public class NetworkHelper
             byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
             SoundsCool.network.sendTo(new SoundChunkPacket(sound.getSoundName(), bytes), player);
         }
-        SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), ""), player);
+        SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory()), player);
     }
 
     private static void uploadSound(Sound sound, String category)
@@ -106,7 +107,7 @@ public class NetworkHelper
     {
         if (byteFile != null && byteFile.length > 0 && !category.isEmpty() && !fileName.isEmpty())
         {
-            File file = new File(SoundHandler.getSoundsFolder().getAbsolutePath() + File.separator + category + File.separator + fileName);
+            File file = new File(SoundHandler.getSoundsFolder().getAbsolutePath() + File.separator + Reference.name + File.separator + category + File.separator + fileName);
             try
             {
                 FileUtils.writeByteArrayToFile(file, byteFile);

@@ -16,7 +16,7 @@ import com.dynious.soundscool.sound.Sound;
 
 public class CheckPresencePacket implements IMessage
 {
-    String fileName;
+    String fileName, category;
     int entityID;
     int worldID;
 
@@ -24,9 +24,10 @@ public class CheckPresencePacket implements IMessage
     {
     }
 
-    public CheckPresencePacket(String soundName, EntityPlayer player)
+    public CheckPresencePacket(String soundName, String category, EntityPlayer player)
     {
         this.fileName = soundName;
+        this.category = category;
         this.entityID = player.getEntityId();
         this.worldID = player.getEntityWorld().provider.getDimensionId();
     }
@@ -41,13 +42,22 @@ public class CheckPresencePacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         fileName = String.valueOf(fileCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
+        
         entityID = bytes.readInt();
         worldID = bytes.readInt();
 
         Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
         if (entity != null && entity instanceof EntityPlayer)
         {
-            Sound sound = SoundHandler.getSound(fileName);
+            Sound sound = SoundHandler.getSound(fileName, category);
 
             if (sound != null)
             {
@@ -68,6 +78,13 @@ public class CheckPresencePacket implements IMessage
         {
             bytes.writeChar(c);
         }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
         bytes.writeInt(entityID);
         bytes.writeInt(worldID);
     }

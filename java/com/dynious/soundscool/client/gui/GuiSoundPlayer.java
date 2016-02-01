@@ -116,7 +116,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         	Sound tileSound = tile.getSelectedSound();
         	if((!selectedSound.equals(tileSound) && selectedSound.hasRemote()) || (selectedSound.equals(tileSound) && selectedSound.getState()!=tileSound.getState() && tileSound.hasRemote()))
         	{
-        		selectedSound = tile.getSelectedSound();
+        		selectedSound = tileSound;
         		onSelectedSoundChanged();
         	}
         	
@@ -193,14 +193,14 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     				selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
                     				NetworkHelper.clientSoundUpload(selectedSound);
                     			}
-                    			tile.selectSound(selectedSound.getSoundName());
+                    			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
                     			selectSoundIndex(-1);
                     			onSelectedSoundChanged();
                     			stopSound();
                     		}
                     		else
                     		{
-                    			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName()));
+                    			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
                     		}
@@ -210,9 +210,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     		if(!SoundHandler.getLocalSounds().contains(selectedSound))
                     		{
                     			selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    			SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getSoundLocation());
+                    			SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getCategory(), selectedSound.getSoundLocation());
 
-                    			tile.selectSound(selectedSound.getSoundName());
+                    			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
                     			onSelectedSoundChanged();
                             	selectSoundIndex(-1);
                             	stopSound();
@@ -313,7 +313,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         {
         	selectedSound = SoundHandler.getSounds().get(selected);
         	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
-        		tile.selectSound(selectedSound.getSoundName());
+        		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
             onSelectedSoundChanged();
         }
     }

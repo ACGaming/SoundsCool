@@ -4,6 +4,7 @@ import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
+import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.sound.Sound;
@@ -63,14 +64,14 @@ public class SoundHandler
         return remoteSounds;
     }
 
-    public static Sound getSound(String fileName)
+    public static Sound getSound(String fileName, String category)
     {
     	Iterator<Sound> iter = sounds.iterator();
 
     	while (iter.hasNext()) {
     	    Sound sound = iter.next();
 
-    	    if(sound.getSoundName().equals(fileName))
+    	    if(sound.getSoundName().equals(fileName) && sound.getCategory().equals(category))
             {
                 return sound;
             }
@@ -100,7 +101,7 @@ public class SoundHandler
             sounds.remove(sound);
             if (FMLCommonHandler.instance().getEffectiveSide().isServer())
             {
-                NetworkHelper.sendMessageToAll(new SoundRemovedPacket(sound.getSoundName()));
+                NetworkHelper.sendMessageToAll(new SoundRemovedPacket(sound.getSoundName(), sound.getCategory()));
             }
         }
     }
@@ -125,7 +126,7 @@ public class SoundHandler
 
     public static void addRemoteSound(String soundName, String remoteCategory)
     {
-        Sound sound = getSound(soundName);
+        Sound sound = getSound(soundName, remoteCategory);
         if (sound != null)
         {
             if (sound.hasLocal())
@@ -139,9 +140,9 @@ public class SoundHandler
         }
     }
 
-    public static void addLocalSound(String soundName, File soundFile)
+    public static void addLocalSound(String soundName, String category, File soundFile)
     {
-        Sound sound = getSound(soundName);
+        Sound sound = getSound(soundName, category);
         if (sound != null)
         {
             if (sound.getState() != Sound.SoundState.SYNCED)
@@ -168,9 +169,9 @@ public class SoundHandler
     }
 
     @SideOnly(Side.CLIENT)
-    public static void playSound(String soundName, String identifier, int x, int y, int z)
+    public static void playSound(String soundName, String category, String identifier, int x, int y, int z)
     {
-        Sound sound = SoundHandler.getSound(soundName);
+        Sound sound = SoundHandler.getSound(soundName, category);
         if (sound != null)
         {
             if (sound.hasLocal())
@@ -181,32 +182,24 @@ public class SoundHandler
         }
         else
         {
-            SoundHandler.addRemoteSound(soundName, Minecraft.getMinecraft().getCurrentServerData().serverIP.replace(':', '-'));
-            sound = SoundHandler.getSound(soundName);
+            SoundHandler.addRemoteSound(soundName, category);
+            sound = SoundHandler.getSound(soundName, category);
         }
 
         if (sound.getState() != Sound.SoundState.DOWNLOADING)
         {
             sound.setState(Sound.SoundState.DOWNLOADING);
-            DelayedPlayHandler.addDelayedPlay(soundName, identifier, x, y, z);
-            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, Minecraft.getMinecraft().thePlayer));
+            DelayedPlayHandler.addDelayedPlay(soundName, category, identifier, x, y, z);
+            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category, Minecraft.getMinecraft().thePlayer));
         }
     }
     @SideOnly(Side.CLIENT)
     public static Sound setupSound(File file)
     {
-        File category;
-        if (Minecraft.getMinecraft().getCurrentServerData() != null)
-        {
-            category = new File("sounds" + File.separator + Minecraft.getMinecraft().getCurrentServerData().serverIP.replace(':', '-'));
-        }
-        else
-        {
-            category = new File("sounds" + File.separator + Minecraft.getMinecraft().thePlayer.getDisplayNameString());
-        }
+        File category = new File("sounds" + File.separator + Reference.name + File.separator + Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText());
         if (!category.exists())
         {
-            category.mkdir();
+            category.mkdirs();
         }
         File newFile = new File(category.getAbsolutePath() + File.separator + file.getName());
         try
