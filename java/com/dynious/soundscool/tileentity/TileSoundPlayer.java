@@ -7,6 +7,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
@@ -19,14 +21,14 @@ import com.dynious.soundscool.sound.Sound;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 public class TileSoundPlayer extends TileEntity
 {
     private boolean isPowered = false;
     private Sound selectedSound;
-    private String lastSoundIdentifier;
+    private String lastSoundIdentifier = "";
     private long timeSoundFinishedPlaying;
+    private int lastSize;
 
     public void setPowered(boolean powered)
     {
@@ -97,11 +99,31 @@ public class TileSoundPlayer extends TileEntity
     {
     	return System.currentTimeMillis() < timeSoundFinishedPlaying;
     }
-
-    @Override
-    public boolean canUpdate()
+    
+    private void reset()
     {
-        return false;
+    	stopCurrentSound();
+    	selectedSound = null;
+    	lastSoundIdentifier = "";
+    	timeSoundFinishedPlaying = 0;
+    	worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    	markDirty();
+    }
+    
+    @Override
+    public void updateEntity()
+    {	
+    	if(FMLCommonHandler.instance().getEffectiveSide().isServer())
+    	{
+    		if(SoundHandler.getSounds().size() < lastSize)
+    		{
+    			if(selectedSound != null && SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory())==null)
+    			{
+    				reset();
+    			}
+    		}
+    		lastSize = SoundHandler.getSounds().size();
+    	}
     }
 
     @Override
@@ -128,8 +150,8 @@ public class TileSoundPlayer extends TileEntity
         String soundName = pkt.func_148857_g().getString("name");
         String category = pkt.func_148857_g().getString("category");
         this.selectedSound = SoundHandler.getSound(soundName, category);
-        Long timeSoundFinishedPlaying = pkt.func_148857_g().getLong("timeSoundFinishedPlaying");
-        this.timeSoundFinishedPlaying = timeSoundFinishedPlaying;
+        this.timeSoundFinishedPlaying = pkt.func_148857_g().getLong("timeSoundFinishedPlaying");
+        
     }
 
     @Override
