@@ -116,8 +116,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         	Sound tileSound = tile.getSelectedSound();
         	if((!selectedSound.equals(tileSound) && selectedSound.hasRemote()) || (selectedSound.equals(tileSound) && selectedSound.getState()!=tileSound.getState() && tileSound.hasRemote()))
         	{
-        		selectedSound = tileSound;
-        		onSelectedSoundChanged();
+        		if(tileSound != null)
+        		{
+        			selectedSound = tileSound;
+        			onSelectedSoundChanged();
+        		}
         	}
         	
             this.getFontRenderer().drawString(selectedSound.getSoundName(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(selectedSound.getSoundName())/2), 30, 0xFFFFFF);
@@ -189,7 +192,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 case 3:
                     if (selectedSound != null)
                     {
-                    	if(Minecraft.getMinecraft().func_147104_D() != null)
+                    	if(!Minecraft.getMinecraft().isIntegratedServerRunning())
                     	{
                     		if (selectedSound.getState() == Sound.SoundState.LOCAL_ONLY)
                     		{
@@ -203,7 +206,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     				NetworkHelper.clientSoundUpload(selectedSound);
                     			}
                     			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-                    			selectSoundIndex(-1);
                     			onSelectedSoundChanged();
                     			stopSound();
                     		}
@@ -212,6 +214,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
+                    			onSelectedSoundChanged();
                     		}
                     	}
                     	else
@@ -223,13 +226,14 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
 
                     			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
                     			onSelectedSoundChanged();
-                            	selectSoundIndex(-1);
                             	stopSound();
                     		}
                     		else
                     		{
+                    			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
-                    			//delete
+                    			onSelectedSoundChanged();
+                    			stopSound();
                     		}
                     	}
                     }
@@ -245,7 +249,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	if(selectedSound != null)
     	{
     		playButton.enabled = true;
-    		if(Minecraft.getMinecraft().func_147104_D() != null)
+    		if(!Minecraft.getMinecraft().isIntegratedServerRunning())
     		{
     			if (selectedSound.hasRemote())
     			{
@@ -270,6 +274,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     			}
     			uploadButton.enabled = true;
     		}
+    	}
+    	else
+    	{
+    		playButton.enabled = false;
+    		uploadButton.enabled = false;
     	}
     }
     
@@ -325,6 +334,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
             onSelectedSoundChanged();
         }
+        else
+        	selectedSound = null;
     }
 
     @Override
