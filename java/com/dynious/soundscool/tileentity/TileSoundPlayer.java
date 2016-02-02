@@ -144,10 +144,10 @@ public class TileSoundPlayer extends TileEntity implements IUpdatePlayerListBox
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        String soundName = pkt.func_148857_g().getString("name");
-        String category = pkt.func_148857_g().getString("category");
+        String soundName = pkt.getNbtCompound().getString("name");
+        String category = pkt.getNbtCompound().getString("category");
         this.selectedSound = SoundHandler.getSound(soundName, category);
-        this.timeSoundFinishedPlaying = pkt.func_148857_g().getLong("timeSoundFinishedPlaying");
+        this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
         
     }
 
