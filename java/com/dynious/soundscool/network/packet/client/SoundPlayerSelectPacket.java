@@ -22,7 +22,7 @@ public class SoundPlayerSelectPacket implements IMessage
 
     public SoundPlayerSelectPacket(TileSoundPlayer tile)
     {
-        this.dimensionId = tile.getWorldObj().provider.dimensionId;
+        this.dimensionId = tile.getWorld().provider.dimensionId;
         this.x = tile.xCoord;
         this.y = tile.yCoord;
         this.z = tile.zCoord;

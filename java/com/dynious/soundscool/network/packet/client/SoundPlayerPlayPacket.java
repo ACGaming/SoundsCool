@@ -21,7 +21,7 @@ public class SoundPlayerPlayPacket implements IMessage
 
     public SoundPlayerPlayPacket(TileSoundPlayer tile)
     {
-        this.dimensionId = tile.getWorldObj().provider.dimensionId;
+        this.dimensionId = tile.getWorld().provider.dimensionId;
         this.x = tile.xCoord;
         this.y = tile.yCoord;
         this.z = tile.zCoord;

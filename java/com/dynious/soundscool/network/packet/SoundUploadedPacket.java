@@ -61,7 +61,7 @@ public class SoundUploadedPacket implements IMessage
         }
         else
         {
-            EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(category);
+            EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(category);
             if (player != null)
             {
                 SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName, category)), player);

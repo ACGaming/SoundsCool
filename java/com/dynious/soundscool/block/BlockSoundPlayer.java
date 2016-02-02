@@ -24,7 +24,7 @@ public class BlockSoundPlayer extends BlockContainer
         super(Material.rock);
         this.setHardness(2F);
         this.setCreativeTab(SoundsCool.tabSoundsCool);
-        this.setBlockName(Names.soundPlayer);
+        this.setUnlocalizedName(Names.soundPlayer);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class BlockSoundPlayer extends BlockContainer
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister iconRegister)
+    public void registerIcons(IIconRegister iconRegister)
     {
         blockTop = iconRegister.registerIcon(Reference.modid + ":" + String.format("%s_top", getUnwrappedUnlocalizedName(this.getUnlocalizedName())));
         blockSide = iconRegister.registerIcon(Reference.modid + ":" + String.format("%s_side", getUnwrappedUnlocalizedName(this.getUnlocalizedName())));

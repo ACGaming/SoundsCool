@@ -47,7 +47,7 @@ public class TileSoundPlayer extends TileEntity
     {
         this.selectedSound = SoundHandler.getSound(soundName, category);
 
-        if (this.getWorldObj().isRemote)
+        if (this.getWorld().isRemote)
         {
         	SoundsCool.network.sendToServer(new SoundPlayerSelectPacket(this));
         }
@@ -71,7 +71,7 @@ public class TileSoundPlayer extends TileEntity
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
                     SoundsCool.network.sendToAllAround(
                     		new ServerPlaySoundPacket(selectedSound.getSoundName(), selectedSound.getCategory(), lastSoundIdentifier, xCoord, yCoord, zCoord),
-                    		new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
+                    		new NetworkRegistry.TargetPoint(getWorld().provider.dimensionId, xCoord, yCoord, zCoord, 64));
                 }
                 else
                 {
@@ -90,7 +90,7 @@ public class TileSoundPlayer extends TileEntity
         if (selectedSound != null && isPlaying())
         {
            SoundsCool.network.sendToAllAround(new StopSoundPacket(lastSoundIdentifier),
-           		new NetworkRegistry.TargetPoint(getWorldObj().provider.dimensionId, xCoord, yCoord, zCoord, 64));
+           		new NetworkRegistry.TargetPoint(getWorld().provider.dimensionId, xCoord, yCoord, zCoord, 64));
             timeSoundFinishedPlaying = 0;
         }
     }
@@ -147,10 +147,10 @@ public class TileSoundPlayer extends TileEntity
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        String soundName = pkt.func_148857_g().getString("name");
-        String category = pkt.func_148857_g().getString("category");
+        String soundName = pkt.getNbtCompound().getString("name");
+        String category = pkt.getNbtCompound().getString("category");
         this.selectedSound = SoundHandler.getSound(soundName, category);
-        this.timeSoundFinishedPlaying = pkt.func_148857_g().getLong("timeSoundFinishedPlaying");
+        this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
         
     }
 
