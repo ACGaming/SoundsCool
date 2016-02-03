@@ -53,7 +53,7 @@ public class GuiSoundsList extends GuiScrollingList
     {
     	ArrayList<Sound> sounds = SoundHandler.getSounds();
     	
-    	if(sounds.size() < listIndex)
+    	if(sounds.size() <= listIndex)
     		return;
         Sound sound = SoundHandler.getSounds().get(listIndex);
         if (sound != null)
