@@ -8,12 +8,19 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
+
+import org.apache.commons.io.FileUtils;
+
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
-import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
 import com.dynious.soundscool.network.packet.client.RemoveSoundPacket;
 import com.dynious.soundscool.network.packet.client.SoundPlayerPlayPacket;
 import com.dynious.soundscool.sound.Sound;
@@ -22,14 +29,6 @@ import com.dynious.soundscool.tileentity.TileSoundPlayer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.server.MinecraftServer;
-
-import org.apache.commons.io.FileUtils;
 
 @SideOnly(Side.CLIENT)
 public class GuiSoundPlayer extends GuiScreen implements IListGui

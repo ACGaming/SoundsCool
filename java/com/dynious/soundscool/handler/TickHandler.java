@@ -1,9 +1,9 @@
 package com.dynious.soundscool.handler;
 
+import net.minecraft.client.Minecraft;
+
 import com.dynious.soundscool.client.audio.SoundPlayer;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 

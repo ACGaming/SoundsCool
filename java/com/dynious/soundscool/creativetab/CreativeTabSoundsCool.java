@@ -1,11 +1,13 @@
 package com.dynious.soundscool.creativetab;
 
-import com.dynious.soundscool.block.ModBlocks;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import com.dynious.soundscool.block.ModBlocks;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class CreativeTabSoundsCool extends CreativeTabs
 {

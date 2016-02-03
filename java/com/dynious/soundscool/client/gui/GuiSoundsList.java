@@ -2,11 +2,12 @@ package com.dynious.soundscool.client.gui;
 
 import java.util.ArrayList;
 
+import net.minecraft.client.renderer.Tessellator;
+
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.sound.Sound;
 
 import cpw.mods.fml.client.GuiScrollingList;
-import net.minecraft.client.renderer.Tessellator;
 
 public class GuiSoundsList extends GuiScrollingList
 {

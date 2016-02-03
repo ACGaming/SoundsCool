@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.File;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 

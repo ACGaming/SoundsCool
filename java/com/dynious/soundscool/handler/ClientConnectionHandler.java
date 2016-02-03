@@ -1,7 +1,5 @@
 package com.dynious.soundscool.handler;
 
-import net.minecraft.client.Minecraft;
-
 import com.dynious.soundscool.client.audio.SoundPlayer;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
