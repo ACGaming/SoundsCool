@@ -1,15 +1,11 @@
 package com.dynious.soundscool.block;
 
-import com.dynious.soundscool.lib.Names;
-import com.dynious.soundscool.lib.Reference;
-
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import com.dynious.soundscool.lib.Names;
 
 public class ModBlocks
 {

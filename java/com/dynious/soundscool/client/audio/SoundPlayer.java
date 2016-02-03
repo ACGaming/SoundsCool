@@ -1,15 +1,14 @@
 package com.dynious.soundscool.client.audio;
 
-import com.dynious.soundscool.handler.SoundHandler;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundManager;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import paulscode.sound.SoundSystem;
 
 @SideOnly(Side.CLIENT)

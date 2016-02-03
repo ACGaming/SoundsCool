@@ -5,9 +5,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 
 public class ServerPlaySoundPacket implements IMessage
 {

@@ -1,11 +1,10 @@
 package com.dynious.soundscool.handler;
 
-import com.dynious.soundscool.client.audio.SoundPlayer;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+
+import com.dynious.soundscool.client.audio.SoundPlayer;
 
 public class TickHandler
 {

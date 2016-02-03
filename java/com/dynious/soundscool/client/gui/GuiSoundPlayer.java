@@ -8,18 +8,6 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.dynious.soundscool.SoundsCool;
-import com.dynious.soundscool.client.audio.SoundPlayer;
-import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.helper.NetworkHelper;
-import com.dynious.soundscool.helper.SoundHelper;
-import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
-import com.dynious.soundscool.network.packet.client.RemoveSoundPacket;
-import com.dynious.soundscool.network.packet.client.SoundPlayerPlayPacket;
-import com.dynious.soundscool.sound.Sound;
-import com.dynious.soundscool.sound.Sound.SoundState;
-import com.dynious.soundscool.tileentity.TileSoundPlayer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -31,12 +19,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.io.FileUtils;
 
 import com.dynious.soundscool.SoundsCool;
+import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
-import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
+import com.dynious.soundscool.network.packet.client.RemoveSoundPacket;
 import com.dynious.soundscool.network.packet.client.SoundPlayerPlayPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.Sound.SoundState;
 import com.dynious.soundscool.tileentity.TileSoundPlayer;
 
 @SideOnly(Side.CLIENT)

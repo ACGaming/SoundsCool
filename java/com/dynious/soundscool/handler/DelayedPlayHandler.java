@@ -1,10 +1,10 @@
 package com.dynious.soundscool.handler;
 
-import com.dynious.soundscool.sound.SoundInfo;
-import com.dynious.soundscool.sound.SoundPlayInfo;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.dynious.soundscool.sound.SoundInfo;
+import com.dynious.soundscool.sound.SoundPlayInfo;
 
 public class DelayedPlayHandler
 {

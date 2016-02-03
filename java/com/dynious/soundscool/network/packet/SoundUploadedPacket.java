@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.File;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -17,7 +15,6 @@ import com.dynious.soundscool.handler.DelayedPlayHandler;
 import com.dynious.soundscool.handler.NetworkHandler;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 
 public class SoundUploadedPacket implements IMessage
