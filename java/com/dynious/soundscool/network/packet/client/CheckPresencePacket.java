@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
@@ -65,7 +66,7 @@ public class CheckPresencePacket implements IMessage
             }
             else
             {
-                NetworkHelper.sendMessageToPlayer(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
+                SoundsCool.network.sendTo(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
             }
         }
     }

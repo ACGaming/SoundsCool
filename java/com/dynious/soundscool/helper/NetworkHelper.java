@@ -26,21 +26,6 @@ import com.dynious.soundscool.sound.Sound;
 public class NetworkHelper
 {
     public static final int PARTITION_SIZE = 30000;
-
-    public static void sendMessageToPlayer(IMessage message, EntityPlayerMP player)
-    {
-        SoundsCool.network.sendTo(message, player);
-    }
-
-    public static void sendMessageToAll(IMessage message)
-    {
-    	//sendToAll causing client disconnect in MP. Iterating over players instead until reason known
-    	Iterator playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
-        while(playerList.hasNext())
-        {
-        	SoundsCool.network.sendTo(message, (EntityPlayerMP)playerList.next());
-        }
-    }
     
     public static void syncPlayerSounds(EntityPlayer player)
     {
@@ -51,7 +36,7 @@ public class NetworkHelper
     public static void syncAllPlayerSounds()
     {
     	SoundHandler.findSounds();
-    	sendMessageToAll(new UploadedSoundsPacket());
+    	SoundsCool.network.sendToAll(new UploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)

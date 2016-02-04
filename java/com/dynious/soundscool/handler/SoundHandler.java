@@ -101,7 +101,7 @@ public class SoundHandler
             sounds.remove(sound);
             if (FMLCommonHandler.instance().getEffectiveSide().isServer())
             {
-                NetworkHelper.sendMessageToAll(new SoundRemovedPacket(sound.getSoundName(), sound.getCategory()));
+                SoundsCool.network.sendToAll(new SoundRemovedPacket(sound.getSoundName(), sound.getCategory()));
             }
         }
     }

@@ -9,6 +9,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
@@ -62,12 +63,14 @@ public class TileSoundPlayer extends TileEntity implements IUpdatePlayerListBox
         {
             if (!isPlaying())
             {
-                if (SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory()) != null)
+            	String name = selectedSound.getSoundName();
+            	String category = selectedSound.getCategory();
+                if (SoundHandler.getSound(name, category) != null)
                 {
                     lastSoundIdentifier = UUID.randomUUID().toString();
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-                    //TODO Change to sendMessageToAllAround
-                    NetworkHelper.sendMessageToAll(new ServerPlaySoundPacket(selectedSound.getSoundName(), selectedSound.getCategory(), lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()));
+                    TargetPoint tp = new TargetPoint(getWorld().provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 64);
+                    SoundsCool.network.sendToAllAround(new ServerPlaySoundPacket(name, category, lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()), tp);
                 }
                 else
                 {
@@ -85,7 +88,7 @@ public class TileSoundPlayer extends TileEntity implements IUpdatePlayerListBox
     {
         if (selectedSound != null && isPlaying())
         {
-            NetworkHelper.sendMessageToAll(new StopSoundPacket(lastSoundIdentifier));
+            SoundsCool.network.sendToAll(new StopSoundPacket(lastSoundIdentifier));
             timeSoundFinishedPlaying = 0;
         }
     }
