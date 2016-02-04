@@ -87,8 +87,7 @@ public class TileSoundPlayer extends TileEntity
     {
         if (selectedSound != null && isPlaying())
         {
-           SoundsCool.network.sendToAllAround(new StopSoundPacket(lastSoundIdentifier),
-           		new NetworkRegistry.TargetPoint(getWorld().provider.dimensionId, xCoord, yCoord, zCoord, 64));
+           SoundsCool.network.sendToAll(new StopSoundPacket(lastSoundIdentifier));
             timeSoundFinishedPlaying = 0;
         }
     }
