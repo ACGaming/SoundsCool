@@ -1,11 +1,10 @@
 package com.dynious.soundscool.handler;
 
-import com.dynious.soundscool.client.audio.SoundPlayer;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+
+import com.dynious.soundscool.client.audio.SoundPlayer;
 
 public class TickHandler
 {
@@ -16,12 +15,12 @@ public class TickHandler
 	{
 		if(paused == false && Minecraft.getMinecraft().isGamePaused())
 		{
-			SoundPlayer.pauseSounds();
+			SoundPlayer.getInstance().pauseSounds();
 			paused = true;
 		}
 		if(paused == true && !Minecraft.getMinecraft().isGamePaused())
 		{
-			SoundPlayer.resumeSounds();
+			SoundPlayer.getInstance().resumeSounds();
 			paused = false;
 		}
 	}

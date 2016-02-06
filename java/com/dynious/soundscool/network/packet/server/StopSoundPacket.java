@@ -5,9 +5,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.client.audio.SoundPlayer;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 
 public class StopSoundPacket implements IMessage
 {
@@ -32,7 +30,7 @@ public class StopSoundPacket implements IMessage
         }
         identifier = String.valueOf(fileCars);
 
-        SoundPlayer.stopSound(identifier);
+        SoundPlayer.getInstance().stopSound(identifier);
     }
 
     @Override

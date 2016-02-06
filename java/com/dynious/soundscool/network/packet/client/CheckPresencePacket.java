@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
@@ -16,7 +17,7 @@ import com.dynious.soundscool.sound.Sound;
 
 public class CheckPresencePacket implements IMessage
 {
-    String fileName;
+    String fileName, category;
     int entityID;
     int worldID;
 
@@ -24,9 +25,10 @@ public class CheckPresencePacket implements IMessage
     {
     }
 
-    public CheckPresencePacket(String soundName, EntityPlayer player)
+    public CheckPresencePacket(String soundName, String category, EntityPlayer player)
     {
         this.fileName = soundName;
+        this.category = category;
         this.entityID = player.getEntityId();
         this.worldID = player.getEntityWorld().provider.getDimensionId();
     }
@@ -41,13 +43,22 @@ public class CheckPresencePacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         fileName = String.valueOf(fileCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
+        
         entityID = bytes.readInt();
         worldID = bytes.readInt();
 
         Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
         if (entity != null && entity instanceof EntityPlayer)
         {
-            Sound sound = SoundHandler.getSound(fileName);
+            Sound sound = SoundHandler.getSound(fileName, category);
 
             if (sound != null)
             {
@@ -55,7 +66,7 @@ public class CheckPresencePacket implements IMessage
             }
             else
             {
-                NetworkHelper.sendMessageToPlayer(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
+                SoundsCool.network.sendTo(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
             }
         }
     }
@@ -68,6 +79,13 @@ public class CheckPresencePacket implements IMessage
         {
             bytes.writeChar(c);
         }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
         bytes.writeInt(entityID);
         bytes.writeInt(worldID);
     }

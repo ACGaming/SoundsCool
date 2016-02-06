@@ -1,10 +1,11 @@
 package com.dynious.soundscool.helper;
 
-import com.dynious.soundscool.SoundsCool;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.dynious.soundscool.SoundsCool;
 
 @SideOnly(Side.CLIENT)
 public class GuiHelper

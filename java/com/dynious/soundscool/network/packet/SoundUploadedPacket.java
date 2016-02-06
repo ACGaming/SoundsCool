@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.File;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -13,11 +11,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.DelayedPlayHandler;
 import com.dynious.soundscool.handler.NetworkHandler;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 
 public class SoundUploadedPacket implements IMessage
@@ -44,10 +42,6 @@ public class SoundUploadedPacket implements IMessage
             catCars[i] = bytes.readChar();
         }
         category = String.valueOf(catCars);
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient() && (category.equalsIgnoreCase("null") || category.isEmpty()))
-        {
-            category = Minecraft.getMinecraft().getCurrentServerData().serverIP.replace(':', '-');
-        }
 
         int fileLength = bytes.readInt();
         char[] fileCars = new char[fileLength];
@@ -58,17 +52,17 @@ public class SoundUploadedPacket implements IMessage
         soundName = String.valueOf(fileCars);
 
         File soundFile = NetworkHelper.createFileFromByteArr(NetworkHandler.soundUploaded(soundName), category, soundName);
-        SoundHandler.addLocalSound(soundName, soundFile);
+        SoundHandler.addLocalSound(soundName, category, soundFile);
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            DelayedPlayHandler.onSoundReceived(soundName);
+            DelayedPlayHandler.onSoundReceived(soundName, category);
         }
         else
         {
             EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(category);
             if (player != null)
             {
-                NetworkHelper.sendMessageToPlayer(new SoundReceivedPacket(SoundHandler.getSound(soundName)), player);
+                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName, category)), player);
             }
         }
     }

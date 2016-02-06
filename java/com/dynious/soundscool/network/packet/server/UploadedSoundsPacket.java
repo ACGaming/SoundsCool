@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.sound.Sound;
 
 public class UploadedSoundsPacket implements IMessage

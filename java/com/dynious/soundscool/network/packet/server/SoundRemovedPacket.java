@@ -5,22 +5,21 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.sound.Sound;
 
 public class SoundRemovedPacket implements IMessage
 {
-    String soundName;
+    String soundName, category;
 
     public SoundRemovedPacket()
     {
     }
 
-    public SoundRemovedPacket(String soundName)
+    public SoundRemovedPacket(String soundName, String category)
     {
         this.soundName = soundName;
+        this.category = category;
     }
 
     @Override
@@ -33,8 +32,16 @@ public class SoundRemovedPacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         soundName = String.valueOf(fileCars);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
 
-        Sound sound = SoundHandler.getSound(soundName);
+        Sound sound = SoundHandler.getSound(soundName, category);
         if (sound != null)
         {
             SoundHandler.remoteRemovedSound(sound);
@@ -46,6 +53,12 @@ public class SoundRemovedPacket implements IMessage
     {
         bytes.writeInt(soundName.length());
         for (char c : soundName.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
         {
             bytes.writeChar(c);
         }

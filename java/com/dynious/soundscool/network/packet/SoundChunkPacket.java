@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.NetworkHandler;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 
 public class SoundChunkPacket implements IMessage
 {

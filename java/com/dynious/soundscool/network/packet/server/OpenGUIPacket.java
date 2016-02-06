@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.helper.GuiHelper;
-import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 
 public class OpenGUIPacket implements IMessage
 {

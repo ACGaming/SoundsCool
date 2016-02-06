@@ -1,19 +1,17 @@
 package com.dynious.soundscool.proxy;
 
+import javax.swing.UIManager;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+
 import com.dynious.soundscool.handler.ClientConnectionHandler;
 import com.dynious.soundscool.handler.TickHandler;
 import com.dynious.soundscool.handler.event.SoundEventHandler;
 import com.dynious.soundscool.lib.Names;
 import com.dynious.soundscool.lib.Reference;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import io.netty.channel.embedded.EmbeddedChannel;
-import net.minecraftforge.common.MinecraftForge;
-
-import javax.swing.*;
 
 public class ClientProxy extends CommonProxy
 {
