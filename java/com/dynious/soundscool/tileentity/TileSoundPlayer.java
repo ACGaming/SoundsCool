@@ -128,6 +128,8 @@ public class TileSoundPlayer extends TileEntity
     {
         super.readFromNBT(compound);
         selectedSound = SoundHandler.getSound(compound.getString("name"), compound.getString("category"));
+        lastSoundIdentifier = compound.getString("lastSoundIdentifier");
+        timeSoundFinishedPlaying = compound.getLong("timeSoundFinishedPlaying");
     }
 
     @Override
@@ -138,6 +140,8 @@ public class TileSoundPlayer extends TileEntity
         {
             compound.setString("name", selectedSound.getSoundName());
             compound.setString("category", selectedSound.getCategory());
+            compound.setString("lastSoundIdentifier", lastSoundIdentifier);
+            compound.setLong("timeSoundFinishedPlaying", timeSoundFinishedPlaying);
         }
     }
 
