@@ -3,6 +3,7 @@ package com.dynious.soundscool.handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
@@ -123,6 +124,7 @@ public class SoundHandler
                 addSoundsFromDir(file);
             }
         }
+        Collections.sort(sounds);
     }
 
     public static void addRemoteSound(String soundName, String remoteCategory)
@@ -138,6 +140,7 @@ public class SoundHandler
         else
         {
             sounds.add(new Sound(soundName, remoteCategory));
+            Collections.sort(sounds);
         }
     }
 
@@ -155,6 +158,7 @@ public class SoundHandler
         {
             sounds.add(new Sound(soundFile));
         }
+        Collections.sort(sounds);
     }
 
     public static void remoteRemovedSound(Sound sound)
@@ -220,6 +224,12 @@ public class SoundHandler
             e.printStackTrace();
         }
         return new Sound(newFile);
+    }
+    
+    public static void reset()
+    {
+    	sounds = new ArrayList<Sound>();
+    	findSounds();
     }
 
 }

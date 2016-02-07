@@ -11,5 +11,6 @@ public class ClientConnectionHandler
 	public void disconnect(ClientDisconnectionFromServerEvent event)
 	{
 		SoundPlayer.getInstance().stopSounds();
+		SoundHandler.reset();
 	}
 }
