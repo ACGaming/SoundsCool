@@ -2,7 +2,7 @@ package com.dynious.soundscool.sound;
 
 import java.io.File;
 
-public class Sound
+public class Sound implements Comparable
 {
     private File soundLocation;
     private String soundName;
@@ -118,5 +118,24 @@ public class Sound
 		} else if (!soundName.equals(other.soundName))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public int compareTo(Object obj)
+	{
+		if(obj == null)
+			throw new NullPointerException();
+		if(this == obj)
+			return 0;
+
+		Sound other = (Sound) obj;
+		int nameCompared = this.soundName.compareToIgnoreCase(other.soundName);
+
+		if(nameCompared == 0)
+		{
+			return this.category.compareToIgnoreCase(other.category);
+		}
+
+		return nameCompared;
 	}
 }
