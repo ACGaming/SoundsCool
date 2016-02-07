@@ -81,6 +81,8 @@ public class TileSoundPlayer extends TileEntity implements IUpdatePlayerListBox
             {
                 stopCurrentSound();
             }
+            worldObj.markBlockForUpdate(pos);
+            markDirty();
         }
     }
 
