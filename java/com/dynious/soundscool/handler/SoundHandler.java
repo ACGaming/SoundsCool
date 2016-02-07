@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.client.audio.SoundPlayer;
-import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
@@ -23,7 +22,7 @@ import com.google.common.io.Files;
 public class SoundHandler
 {
     private static File soundsFolder;
-    private static ArrayList<Sound> sounds;
+    private static ArrayList<Sound> sounds = new ArrayList<Sound>();
 
     public static File getSoundsFolder()
     {
@@ -86,7 +85,6 @@ public class SoundHandler
         {
             soundsFolder.mkdir();
         }
-        sounds = new ArrayList<Sound>();
         addSoundsFromDir(soundsFolder);
     }
 
@@ -114,7 +112,9 @@ public class SoundHandler
             {
                 if (file.getName().endsWith(".ogg") || file.getName().endsWith(".wav") || file.getName().endsWith(".mp3"))
                 {
-                    sounds.add(new Sound(file));
+                	Sound sound = new Sound(file);
+                	if(!sounds.contains(sound))
+                		sounds.add(sound);
                 }
             }
             else if (file.isDirectory())

@@ -81,6 +81,8 @@ public class TileSoundPlayer extends TileEntity implements ITickable
             {
                 stopCurrentSound();
             }
+            worldObj.markBlockForUpdate(pos);
+            markDirty();
         }
     }
 
