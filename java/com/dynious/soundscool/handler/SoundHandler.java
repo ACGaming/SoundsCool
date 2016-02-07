@@ -23,7 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class SoundHandler
 {
     private static File soundsFolder;
-    private static ArrayList<Sound> sounds;
+    private static ArrayList<Sound> sounds = new ArrayList<Sound>();
 
     public static File getSoundsFolder()
     {
@@ -86,7 +86,6 @@ public class SoundHandler
         {
             soundsFolder.mkdir();
         }
-        sounds = new ArrayList<Sound>();
         addSoundsFromDir(soundsFolder);
     }
 
@@ -114,7 +113,9 @@ public class SoundHandler
             {
                 if (file.getName().endsWith(".ogg") || file.getName().endsWith(".wav") || file.getName().endsWith(".mp3"))
                 {
-                    sounds.add(new Sound(file));
+                	Sound sound = new Sound(file);
+                	if(!sounds.contains(sound))
+                		sounds.add(sound);
                 }
             }
             else if (file.isDirectory())

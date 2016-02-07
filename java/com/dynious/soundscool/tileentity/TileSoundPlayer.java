@@ -80,6 +80,8 @@ public class TileSoundPlayer extends TileEntity
             {
                 stopCurrentSound();
             }
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            markDirty();
         }
     }
 
