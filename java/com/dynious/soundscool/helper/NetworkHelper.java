@@ -2,12 +2,9 @@ package com.dynious.soundscool.helper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,12 +28,6 @@ public class NetworkHelper
     {
     	SoundHandler.findSounds();
     	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket(player));
-    }
-    
-    public static void syncAllPlayerSounds()
-    {
-    	SoundHandler.findSounds();
-    	SoundsCool.network.sendToAll(new UploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)
