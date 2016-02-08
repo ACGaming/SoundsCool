@@ -176,6 +176,20 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     	stopSound();
                         selectSoundIndex(-1);
                         selectedSound = new Sound(fileChooser.getSelectedFile());
+                        if(!SoundHandler.getSounds().contains(selectedSound))
+                        {
+                        	selectedSound.setCategory(mc.thePlayer.getDisplayName());
+                        	if(SoundHandler.getSounds().contains(selectedSound))
+                        	{
+                        		selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+                        		return;
+                        	}
+                        }
+                        else
+                        {
+                        	selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+                        	return;
+                        }
                         onSelectedSoundChanged();
                     }
                     break;
