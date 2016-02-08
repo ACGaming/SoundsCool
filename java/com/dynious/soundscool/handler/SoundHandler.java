@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -16,7 +15,6 @@ import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
-import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.sound.Sound;
 import com.google.common.io.Files;
 
@@ -98,10 +96,6 @@ public class SoundHandler
                 sound.getSoundLocation().deleteOnExit();
             }
             sounds.remove(sound);
-            if (FMLCommonHandler.instance().getEffectiveSide().isServer())
-            {
-                SoundsCool.network.sendToAll(new SoundRemovedPacket(sound.getSoundName(), sound.getCategory()));
-            }
         }
     }
 

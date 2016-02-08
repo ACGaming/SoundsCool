@@ -3,12 +3,14 @@ package com.dynious.soundscool.network.packet.client;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.SoundsCool;
+import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 
 public class GetUploadedSoundsPacket implements IMessage
@@ -35,7 +37,8 @@ public class GetUploadedSoundsPacket implements IMessage
         Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
         if (entity != null && entity instanceof EntityPlayer)
         {
-            SoundsCool.network.sendToAll(new UploadedSoundsPacket());
+        	SoundHandler.findSounds();
+            SoundsCool.network.sendTo(new UploadedSoundsPacket(), (EntityPlayerMP) entity);
         }
     }
 

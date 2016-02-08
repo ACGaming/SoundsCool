@@ -7,6 +7,7 @@ import java.io.File;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -17,6 +18,7 @@ import com.dynious.soundscool.handler.NetworkHandler;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
+import com.dynious.soundscool.sound.Sound;
 
 public class SoundUploadedPacket implements IMessage
 {
@@ -82,7 +84,18 @@ public class SoundUploadedPacket implements IMessage
         }
     }
     
-    public static class Handler implements IMessageHandler<SoundUploadedPacket, IMessage> {
+    public static class ServerSideHandler implements IMessageHandler<SoundUploadedPacket, IMessage> {
+        @Override
+        public IMessage onMessage(SoundUploadedPacket message, MessageContext ctx) {
+        	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+        	int dimension = player.dimension;
+        	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64);
+        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.soundName, message.category)), targetPoint);
+            return null;
+        }
+    }
+    
+    public static class ClientSideHandler implements IMessageHandler<SoundUploadedPacket, IMessage> {
         @Override
         public IMessage onMessage(SoundUploadedPacket message, MessageContext ctx) {
             return null;

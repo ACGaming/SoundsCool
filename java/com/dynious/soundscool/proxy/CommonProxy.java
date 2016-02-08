@@ -48,8 +48,8 @@ public class CommonProxy
     	SoundsCool.network.registerMessage(SoundChunkPacket.Handler.class, SoundChunkPacket.class, 12, Side.CLIENT);
     	SoundsCool.network.registerMessage(SoundChunkPacket.Handler.class, SoundChunkPacket.class, 12, Side.SERVER);
     	
-    	SoundsCool.network.registerMessage(SoundUploadedPacket.Handler.class, SoundUploadedPacket.class, 13, Side.CLIENT);
-    	SoundsCool.network.registerMessage(SoundUploadedPacket.Handler.class, SoundUploadedPacket.class, 13, Side.SERVER);
+    	SoundsCool.network.registerMessage(SoundUploadedPacket.ClientSideHandler.class, SoundUploadedPacket.class, 13, Side.CLIENT);
+    	SoundsCool.network.registerMessage(SoundUploadedPacket.ServerSideHandler.class, SoundUploadedPacket.class, 13, Side.SERVER);
     }
 
     public void soundSetup()
