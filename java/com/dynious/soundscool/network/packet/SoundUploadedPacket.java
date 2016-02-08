@@ -13,8 +13,10 @@ import com.dynious.soundscool.handler.NetworkHandler;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
+import com.dynious.soundscool.sound.Sound;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -83,7 +85,18 @@ public class SoundUploadedPacket implements IMessage
         }
     }
     
-    public static class Handler implements IMessageHandler<SoundUploadedPacket, IMessage> {
+    public static class ServerSideHandler implements IMessageHandler<SoundUploadedPacket, IMessage> {
+        @Override
+        public IMessage onMessage(SoundUploadedPacket message, MessageContext ctx) {
+        	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+        	int dimension = player.dimension;
+        	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64);
+        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.soundName, message.category)), targetPoint);
+            return null;
+        }
+    }
+    
+    public static class ClientSideHandler implements IMessageHandler<SoundUploadedPacket, IMessage> {
         @Override
         public IMessage onMessage(SoundUploadedPacket message, MessageContext ctx) {
             return null;

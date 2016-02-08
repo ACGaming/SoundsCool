@@ -10,7 +10,6 @@ import net.minecraft.tileentity.TileEntity;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.network.packet.client.SoundPlayerSelectPacket;
 import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
@@ -19,6 +18,7 @@ import com.dynious.soundscool.sound.Sound;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class TileSoundPlayer extends TileEntity
 {
@@ -58,7 +58,6 @@ public class TileSoundPlayer extends TileEntity
 
     public void playCurrentSound()
     {
-    	NetworkHelper.syncAllPlayerSounds();
         if (selectedSound != null)
         {
             if (!isPlaying())
@@ -89,7 +88,8 @@ public class TileSoundPlayer extends TileEntity
     {
         if (selectedSound != null && isPlaying())
         {
-           SoundsCool.network.sendToAll(new StopSoundPacket(lastSoundIdentifier));
+        	TargetPoint targetPoint = new TargetPoint(worldObj.provider.dimensionId, xCoord, yCoord, zCoord, 64);
+            SoundsCool.network.sendToAllAround(new StopSoundPacket(lastSoundIdentifier), targetPoint);
             timeSoundFinishedPlaying = 0;
         }
     }
@@ -152,7 +152,12 @@ public class TileSoundPlayer extends TileEntity
     {
         String soundName = pkt.getNbtCompound().getString("name");
         String category = pkt.getNbtCompound().getString("category");
-        this.selectedSound = SoundHandler.getSound(soundName, category);
+        selectedSound = SoundHandler.getSound(soundName, category);
+        if(selectedSound == null && soundName.length() != 0 && category.length() != 0)
+        {
+        	selectedSound = new Sound(soundName, category);
+        	SoundHandler.addRemoteSound(soundName, category);
+        }
         this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
         
     }
@@ -160,7 +165,6 @@ public class TileSoundPlayer extends TileEntity
     @Override
     public Packet getDescriptionPacket()
     {
-    	NetworkHelper.syncAllPlayerSounds();
         NBTTagCompound compound = new NBTTagCompound();
         if (selectedSound != null)
         {

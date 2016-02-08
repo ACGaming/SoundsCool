@@ -13,11 +13,9 @@ import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
-import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.sound.Sound;
 import com.google.common.io.Files;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -99,10 +97,6 @@ public class SoundHandler
                 sound.getSoundLocation().deleteOnExit();
             }
             sounds.remove(sound);
-            if (FMLCommonHandler.instance().getEffectiveSide().isServer())
-            {
-                SoundsCool.network.sendToAll(new SoundRemovedPacket(sound.getSoundName(), sound.getCategory()));
-            }
         }
     }
 

@@ -15,7 +15,6 @@ import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.SoundChunkPacket;
 import com.dynious.soundscool.network.packet.SoundUploadedPacket;
 import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
-import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 import com.dynious.soundscool.sound.Sound;
 
 import cpw.mods.fml.relauncher.Side;
@@ -29,12 +28,6 @@ public class NetworkHelper
     {
     	SoundHandler.findSounds();
     	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket(player));
-    }
-    
-    public static void syncAllPlayerSounds()
-    {
-    	SoundHandler.findSounds();
-    	SoundsCool.network.sendToAll(new UploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)
