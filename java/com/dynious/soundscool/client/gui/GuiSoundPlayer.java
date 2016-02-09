@@ -122,6 +122,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             }
         }
         updateButtons();
+        
+        if(tile.isInvalid())
+    		this.mc.displayGuiScreen(null);
     }
     
     private void updateButtons()
