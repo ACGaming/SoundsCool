@@ -33,23 +33,22 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiSoundPlayer extends GuiScreen implements IListGui
 {
-    private GuiSoundsList soundsList;
+    private GuiSoundsList soundsListGui;
     private TileSoundPlayer tile;
     private GuiButton playButton;
     private JFileChooser fileChooser;
     private GuiButton uploadButton;
-    private UUID currentlyPlayerSoundId;
+    private String currentSoundID;
     private long timeSoundFinishedPlaying;
     private Sound selectedSound;
-    private int selected = -1;
 
     public GuiSoundPlayer(TileSoundPlayer tile)
     {
         this.tile = tile;
-        NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);
         
-        selectedSound = tile.getSelectedSound();
-        
+        selectedSound = tile.getSelectedSound(); 
+        NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);  
+         
         try
         {
             fileChooser = new JFileChooser(Minecraft.getMinecraft().mcDataDir)
@@ -77,11 +76,10 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public void initGui()
     {
         super.initGui();
-        soundsList = new GuiSoundsList(this, 150);
+        soundsListGui = new GuiSoundsList(this, 150);
+        
         this.buttonList.add(new GuiButton(0, getWidth() / 2, getHeight() - 32, I18n.format("gui.done")));
         this.buttonList.add(playButton = new GuiButton(1, getWidth() / 2, getHeight() - 57, "Play Sound"));
-        
-        playButton.enabled = false;
         
         GuiButton fileButton = new GuiButton(2, 10, getHeight() - 32, 150, 20, "Select File");
         this.buttonList.add(fileButton);
@@ -89,61 +87,101 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             fileButton.enabled = false;
         
         this.buttonList.add(uploadButton = new GuiButton(3, getWidth() / 2, getHeight() - 82, "Upload"));
-        uploadButton.enabled = false;
-        
-        onSelectedSoundChanged();
     }
 
     @Override
     public void drawScreen(int p_571_1_, int p_571_2_, float p_571_3_)
     {
-        this.soundsList.drawScreen(p_571_1_, p_571_2_, p_571_3_);
+        soundsListGui.drawScreen(p_571_1_, p_571_2_, p_571_3_);
         super.drawScreen(p_571_1_, p_571_2_, p_571_3_);
 
         if (selectedSound != null)
         {
-        	if(selectedSound.getState() == SoundState.UPLOADING)
-        		uploadButton.enabled = false;
         	Sound tileSound = tile.getSelectedSound();
         	if((!selectedSound.equals(tileSound) && selectedSound.hasRemote()) || (selectedSound.equals(tileSound) && selectedSound.getState()!=tileSound.getState() && tileSound.hasRemote()))
         	{
         		if(tileSound != null)
         		{
         			selectedSound = tileSound;
-        			onSelectedSoundChanged();
         		}
         	}
         	
-            this.getFontRenderer().drawString(selectedSound.getSoundName(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(selectedSound.getSoundName())/2), 30, 0xFFFFFF);
+        	String name = selectedSound.getSoundName();
+            this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
 
             SoundState downloaded = selectedSound.getState();
             this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
 
             String category = selectedSound.getCategory();
-            this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 120, 0xFFFFFF);
+            this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 90, 0xFFFFFF);
 
             if (selectedSound.getSoundLocation() != null)
             {
                 String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
-                this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 150, 0xFFFFFF);
+                this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 120, 0xFFFFFF);
             }
-            if(tile.isPlaying() || System.currentTimeMillis() < timeSoundFinishedPlaying)
+        }
+        updateButtons();
+    }
+    
+    private void updateButtons()
+    {
+    	if(selectedSound != null)
+    	{	
+    		if(!Minecraft.getMinecraft().isIntegratedServerRunning())
+    		{
+    			if (selectedSound.hasRemote())
+    			{
+    				uploadButton.displayString = "Delete";
+    				uploadButton.enabled = selectedSound.getCategory().equals(mc.thePlayer.getDisplayName());
+    			}
+    			else
+    			{
+    				uploadButton.displayString = "Upload and Save";
+    				uploadButton.enabled = true;
+    			}
+    		}
+    		else
+    		{
+    			if (selectedSound.getState()==SoundState.SYNCED)
+    			{
+    				uploadButton.displayString = "Delete";
+    			}
+    			else
+    			{
+    				uploadButton.displayString = "Save";
+    			}
+    			uploadButton.enabled = true;
+    		}
+    		
+    		if(tile.isPlaying() || System.currentTimeMillis() < timeSoundFinishedPlaying)
             {
             	playButton.displayString="Stop Sound";
             }
-            else
+            else if(selectedSound.hasRemote())
             {
             	playButton.displayString="Play Sound";
             }
-            if(selectedSound.getState().equals(SoundState.DOWNLOADING) || selectedSound.getState().equals(SoundState.UPLOADING))
+            else
             {
-				playButton.enabled = false;
+            	playButton.displayString="Preview Sound";
             }
-			else
-			{
-				playButton.enabled = true;
-			}
-        }
+    		
+    		if(selectedSound.getState().equals(SoundState.DOWNLOADING) || selectedSound.getState().equals(SoundState.UPLOADING))
+            {
+    			playButton.enabled = false;
+    			uploadButton.enabled = false;
+            }
+    		else
+    		{
+    			playButton.enabled = true;
+    		}
+    	}
+    	else
+    	{
+    		playButton.enabled = false;
+    		uploadButton.enabled = false;
+    	}
     }
 
     @Override
@@ -157,10 +195,10 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     this.mc.setIngameFocus();
                     break;
                 case 1:
-                	if(playButton.displayString.equals("Play Sound"))
-                		playSound();
-                	else
+                	if(playButton.displayString.equals("Stop Sound"))
                 		stopSound();
+                	else
+                		playSound();
                     break;
                 case 2:
                 	if (Minecraft.getMinecraft().isFullScreen())
@@ -191,7 +229,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                         	selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
                         	return;
                         }
-                        onSelectedSoundChanged();
                     }
                     break;
                 case 3:
@@ -211,7 +248,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     				NetworkHelper.clientSoundUpload(selectedSound);
                     			}
                     			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-                    			onSelectedSoundChanged();
                     			stopSound();
                     		}
                     		else
@@ -219,7 +255,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
-                    			onSelectedSoundChanged();
+                    			stopSound();
                     		}
                     	}
                     	else
@@ -230,61 +266,18 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getCategory(), selectedSound.getSoundLocation());
 
                     			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-                    			onSelectedSoundChanged();
                             	stopSound();
                     		}
                     		else
                     		{
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
-                    			onSelectedSoundChanged();
                     			stopSound();
                     		}
                     	}
                     }
                     break;
             }
-    }
-
-    public void onSelectedSoundChanged()
-    {
-    	if(selected != -1)
-    		stopSound();
-    	selected = SoundHandler.getSounds().indexOf(selectedSound);
-    	if(selectedSound != null)
-    	{
-    		playButton.enabled = true;
-    		if(!Minecraft.getMinecraft().isIntegratedServerRunning())
-    		{
-    			if (selectedSound.hasRemote())
-    			{
-    				uploadButton.displayString = "Delete";
-    				uploadButton.enabled = selectedSound.getCategory().equals(mc.thePlayer.getDisplayName());
-    			}
-    			else
-    			{
-    				uploadButton.displayString = "Upload and Save";
-    				uploadButton.enabled = true;
-    			}
-    		}
-    		else
-    		{
-    			if (selectedSound.getState()==SoundState.SYNCED)
-    			{
-    				uploadButton.displayString = "Delete";
-    			}
-    			else
-    			{
-    				uploadButton.displayString = "Save";
-    			}
-    			uploadButton.enabled = true;
-    		}
-    	}
-    	else
-    	{
-    		playButton.enabled = false;
-    		uploadButton.enabled = false;
-    	}
     }
     
     private void playSound()
@@ -295,9 +288,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	}
     	else if(selectedSound != null)
     	{
-    		currentlyPlayerSoundId = UUID.randomUUID();
+    		currentSoundID = UUID.randomUUID().toString();
     		timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
-    		SoundPlayer.getInstance().playSound(selectedSound.getSoundLocation(), currentlyPlayerSoundId.toString(), (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
+    		SoundPlayer.getInstance().playSound(selectedSound.getSoundLocation(), currentSoundID, (float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ, false);
     	}
     	playButton.displayString = "Stop Sound";
     }
@@ -311,7 +304,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	else if(System.currentTimeMillis() < timeSoundFinishedPlaying)
     	{
     		timeSoundFinishedPlaying = 0;
-    		SoundPlayer.getInstance().stopSound(currentlyPlayerSoundId.toString());
+    		SoundPlayer.getInstance().stopSound(currentSoundID);
     	}
     	playButton.displayString = "Play Sound";
     }
@@ -331,13 +324,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void selectSoundIndex(int selected)
     {
-    	this.selected = selected;
         if (selected >= 0 && selected < SoundHandler.getSounds().size())
         {
         	selectedSound = SoundHandler.getSounds().get(selected);
         	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
         		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-            onSelectedSoundChanged();
         }
         else
         	selectedSound = null;
@@ -346,7 +337,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public boolean soundIndexSelected(int var1)
     {
-        return selected == var1;
+        return SoundHandler.getSounds().indexOf(selectedSound) == var1;
     }
 
     @Override
@@ -376,9 +367,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void onGuiClosed()
     {
-        if (System.currentTimeMillis() < timeSoundFinishedPlaying)
-        {
-            SoundPlayer.getInstance().stopSound(currentlyPlayerSoundId.toString());
-        }
+    	SoundPlayer.getInstance().stopSound(currentSoundID);
     }
 }
