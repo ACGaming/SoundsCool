@@ -139,7 +139,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     			if (selectedSound.hasRemote())
     			{
     				uploadButton.displayString = "Delete";
-    				uploadButton.enabled = selectedSound.getCategory().equals(mc.thePlayer.getDisplayName());
+    				uploadButton.enabled = selectedSound.getCategory().equals(mc.thePlayer.getDisplayName().getUnformattedText());
     			}
     			else
     			{
@@ -274,7 +274,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             selectedSound = new Sound(fileChooser.getSelectedFile());
             if(!SoundHandler.getSounds().contains(selectedSound))
             {
-            	selectedSound.setCategory(mc.thePlayer.getDisplayName());
+            	selectedSound.setCategory(mc.thePlayer.getDisplayName().getUnformattedText());
             	if(SoundHandler.getSounds().contains(selectedSound))
             	{
             		selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
