@@ -300,7 +300,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     	{
     		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
     	}
-    	else if(System.currentTimeMillis() < timeSoundFinishedPlaying)
+    	if(System.currentTimeMillis() < timeSoundFinishedPlaying)
     	{
     		timeSoundFinishedPlaying = 0;
     		SoundPlayer.getInstance().stopSound(currentSoundID);
@@ -323,11 +323,14 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public void selectSoundIndex(int selected)
     {
+    	stopSound();
         if (selected >= 0 && selected < SoundHandler.getSounds().size())
         {
         	selectedSound = SoundHandler.getSounds().get(selected);
         	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
         		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
+        	
+        	playSound();
         }
         else
         	selectedSound = null;
