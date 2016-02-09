@@ -41,6 +41,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     private String currentSoundID;
     private long timeSoundFinishedPlaying;
     private Sound selectedSound;
+    private boolean pause = false;
 
     public GuiSoundPlayer(TileSoundPlayer tile)
     {
@@ -122,6 +123,9 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             }
         }
         updateButtons();
+
+        if(pause == true && (mc.isGamePaused() || mc.getIntegratedServer() == null))
+        	selectingFromSystem();
         
         if(tile.isInvalid())
     		this.mc.displayGuiScreen(null);
@@ -131,7 +135,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     {
     	if(selectedSound != null)
     	{	
-    		if(!Minecraft.getMinecraft().isIntegratedServerRunning())
+    		if(!mc.isIntegratedServerRunning())
     		{
     			if (selectedSound.hasRemote())
     			{
@@ -204,35 +208,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 		playSound();
                     break;
                 case 2:
-                	if (Minecraft.getMinecraft().isFullScreen())
-                    {
-                        Minecraft.getMinecraft().toggleFullscreen();
-                    }
-                    int fcReturn = fileChooser.showOpenDialog(null);
-                    if (Minecraft.getMinecraft().gameSettings.fullScreen != Minecraft.getMinecraft().isFullScreen())
-                    {
-                        Minecraft.getMinecraft().toggleFullscreen();
-                    }
-                    if (fcReturn == JFileChooser.APPROVE_OPTION)
-                    {
-                    	stopSound();
-                        selectSoundIndex(-1);
-                        selectedSound = new Sound(fileChooser.getSelectedFile());
-                        if(!SoundHandler.getSounds().contains(selectedSound))
-                        {
-                        	selectedSound.setCategory(mc.thePlayer.getDisplayName());
-                        	if(SoundHandler.getSounds().contains(selectedSound))
-                        	{
-                        		selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
-                        		return;
-                        	}
-                        }
-                        else
-                        {
-                        	selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
-                        	return;
-                        }
-                    }
+                	pause = true;
                     break;
                 case 3:
                     if (selectedSound != null)
@@ -258,7 +234,6 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
-                    			stopSound();
                     		}
                     	}
                     	else
@@ -275,12 +250,44 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     		{
                     			SoundHandler.removeSound(selectedSound);
                     			selectSoundIndex(-1);
-                    			stopSound();
                     		}
                     	}
                     }
                     break;
             }
+    }
+    
+    private void selectingFromSystem()
+    {
+    	pause = false;
+    	if (Minecraft.getMinecraft().isFullScreen())
+        {
+            Minecraft.getMinecraft().toggleFullscreen();
+        }
+        int fcReturn = fileChooser.showOpenDialog(null);
+        if (Minecraft.getMinecraft().gameSettings.fullScreen != Minecraft.getMinecraft().isFullScreen())
+        {
+            Minecraft.getMinecraft().toggleFullscreen();
+        }
+        if (fcReturn == JFileChooser.APPROVE_OPTION)
+        {
+            selectSoundIndex(-1);
+            selectedSound = new Sound(fileChooser.getSelectedFile());
+            if(!SoundHandler.getSounds().contains(selectedSound))
+            {
+            	selectedSound.setCategory(mc.thePlayer.getDisplayName());
+            	if(SoundHandler.getSounds().contains(selectedSound))
+            	{
+            		selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+            	}
+            	else
+            		playSound();
+            }
+            else
+            {
+            	selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+            }
+        }
     }
     
     private void playSound()
@@ -367,7 +374,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public boolean doesGuiPauseGame()
     {
-        return false;
+        return pause;
     }
     
     @Override
