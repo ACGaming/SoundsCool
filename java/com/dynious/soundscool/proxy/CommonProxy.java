@@ -1,9 +1,11 @@
 package com.dynious.soundscool.proxy;
 
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 import com.dynious.soundscool.SoundsCool;
+import com.dynious.soundscool.handler.event.PlayerEventHandler;
 import com.dynious.soundscool.lib.Names;
 import com.dynious.soundscool.network.packet.SoundChunkPacket;
 import com.dynious.soundscool.network.packet.SoundUploadedPacket;
@@ -17,6 +19,7 @@ import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
+import com.dynious.soundscool.network.packet.server.StopAllSoundsPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.network.packet.server.UploadedSoundsPacket;
 import com.dynious.soundscool.tileentity.TileSoundPlayer;
@@ -44,6 +47,7 @@ public class CommonProxy
     	SoundsCool.network.registerMessage(SoundRemovedPacket.Handler.class, SoundRemovedPacket.class, 9, Side.CLIENT);
     	SoundsCool.network.registerMessage(StopSoundPacket.Handler.class, StopSoundPacket.class, 10, Side.CLIENT);
     	SoundsCool.network.registerMessage(UploadedSoundsPacket.Handler.class, UploadedSoundsPacket.class, 11, Side.CLIENT);
+    	SoundsCool.network.registerMessage(StopAllSoundsPacket.Handler.class, StopAllSoundsPacket.class, 14, Side.CLIENT);
         
     	SoundsCool.network.registerMessage(SoundChunkPacket.Handler.class, SoundChunkPacket.class, 12, Side.CLIENT);
     	SoundsCool.network.registerMessage(SoundChunkPacket.Handler.class, SoundChunkPacket.class, 12, Side.SERVER);
@@ -54,6 +58,7 @@ public class CommonProxy
 
     public void soundSetup()
     {
+    	FMLCommonHandler.instance().bus().register(new PlayerEventHandler());
     }
 
     public void UISetup()
