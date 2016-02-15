@@ -61,8 +61,6 @@ public class SoundPlayerSelectPacket implements IMessage
             if (tile != null && tile instanceof TileSoundPlayer)
             {
                 ((TileSoundPlayer)tile).selectSound(soundName, category);
-                world.markBlockForUpdate(tile.getPos());
-                tile.markDirty();
             }
         }
     }

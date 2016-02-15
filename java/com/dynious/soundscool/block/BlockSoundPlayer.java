@@ -88,17 +88,6 @@ public class BlockSoundPlayer extends Block implements ITileEntityProvider
         }
     }
 
-    @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
-        TileEntity tile =  world.getTileEntity(pos);
-        if (tile != null && tile instanceof TileSoundPlayer)
-        {
-            ((TileSoundPlayer)tile).stopCurrentSound();
-        }
-        super.breakBlock(world, pos, state);
-    }
-
     protected String getUnwrappedUnlocalizedName(String unlocalizedName)
     {
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);

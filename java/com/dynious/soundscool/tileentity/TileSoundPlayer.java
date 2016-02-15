@@ -8,10 +8,10 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 import com.dynious.soundscool.SoundsCool;
+import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.network.packet.client.SoundPlayerSelectPacket;
@@ -25,7 +25,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     private Sound selectedSound;
     private String lastSoundIdentifier = "";
     private long timeSoundFinishedPlaying;
-    private int lastSize;
+    private int count = 0;
 
     public void setPowered(boolean powered)
     {
@@ -44,9 +44,13 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     {
         this.selectedSound = SoundHandler.getSound(soundName, category);
 
-        if (this.getWorld().isRemote)
+        if (worldObj.isRemote)
         {
         	SoundsCool.network.sendToServer(new SoundPlayerSelectPacket(this));
+        }
+        else
+        {
+        	playCurrentSound();
         }
     }
 
@@ -72,15 +76,15 @@ public class TileSoundPlayer extends TileEntity implements ITickable
                 }
                 else
                 {
-                selectedSound = null;
+                	selectedSound = null;
                 }
+                sync();
             }
             else
             {
                 stopCurrentSound();
+                sync();
             }
-            worldObj.markBlockForUpdate(pos);
-            markDirty();
         }
     }
 
@@ -105,23 +109,51 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     	selectedSound = null;
     	lastSoundIdentifier = "";
     	timeSoundFinishedPlaying = 0;
-    	worldObj.markBlockForUpdate(pos);
-    	markDirty();
+    	sync();
     }
     
     @Override
     public void update()
     {	
-    	if(FMLCommonHandler.instance().getEffectiveSide().isServer())
+    	if(worldObj.isRemote)
+		{
+			if(timeSoundFinishedPlaying == 0 && SoundPlayer.getInstance().isPlaying(lastSoundIdentifier))
+			{
+				SoundPlayer.getInstance().stopSound(lastSoundIdentifier);
+			}
+		}
+    	else if(count == 0)
     	{
-    		if(SoundHandler.getSounds().size() < lastSize)
+    		if(selectedSound != null && SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory())==null)
     		{
-    			if(selectedSound != null && SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory())==null)
-    			{
-    				reset();
-    			}
+    			reset();
     		}
-    		lastSize = SoundHandler.getSounds().size();
+    	}
+    	count = ++count % 200;
+    }
+    
+    private void sync()
+    {
+    	worldObj.markBlockForUpdate(pos);
+    	markDirty();
+    }
+    
+    @Override
+    public void invalidate()
+    {
+    	super.invalidate();
+    	if(worldObj.isRemote)
+    	{
+    		SoundPlayer.getInstance().stopSound(lastSoundIdentifier);
+    	}
+    }
+    
+    @Override
+    public void onChunkUnload()
+    {
+    	if(worldObj.isRemote && isPlaying())
+    	{
+    		SoundPlayer.getInstance().stopSound(lastSoundIdentifier);
     	}
     }
 
@@ -159,7 +191,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         	SoundHandler.addRemoteSound(soundName, category);
         }
         this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
-        
+        this.lastSoundIdentifier = pkt.getNbtCompound().getString("lastSoundIdentifier");
     }
 
     @Override
@@ -171,6 +203,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
             compound.setString("name", selectedSound.getSoundName());
             compound.setString("category", selectedSound.getCategory());
             compound.setLong("timeSoundFinishedPlaying", timeSoundFinishedPlaying);
+            compound.setString("lastSoundIdentifier", lastSoundIdentifier);
         }
         return new S35PacketUpdateTileEntity(pos, 1, compound);
     }

@@ -89,7 +89,7 @@ public class SoundHandler
 
     public static void removeSound(Sound sound)
     {
-        if (sound != null)
+        if (sound != null && sound.getSoundLocation() != null)
         {
             if (!sound.getSoundLocation().delete())
             {
@@ -188,7 +188,7 @@ public class SoundHandler
         {
             sound.setState(Sound.SoundState.DOWNLOADING);
             DelayedPlayHandler.addDelayedPlay(soundName, category, identifier, x, y, z);
-            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category, Minecraft.getMinecraft().thePlayer));
+            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category));
         }
     }
     @SideOnly(Side.CLIENT)

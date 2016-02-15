@@ -51,41 +51,37 @@ public class SoundPlayer
     		playing.remove(identifier);
     	}
     }
-    
+
     public void stopSounds()
     {
-    	if(soundSystem!=null)
+    	for(String s : playing)
     	{
-    		for(String s : playing)
-			{
-				soundSystem.stop(s);
-			}
+    		soundSystem.stop(s);
     	}
     	playing = new ArrayList<String>();
     }
-    
+
     public void pauseSounds()
-	{
-		if(soundSystem != null)
-		{
-			for(String s : playing)
-			{
-				soundSystem.pause(s);
-			}
-		}
-	}
-    
+    {
+    	for(String s : playing)
+    	{
+    		soundSystem.pause(s);
+    	}
+    }
+
     public void resumeSounds()
-	{
-		if(soundSystem != null)
-		{
-			for(String s : playing)
-			{
-				soundSystem.play(s);
-			}
-		}
-	}
+    {
+    	for(String s : playing)
+    	{
+    		soundSystem.play(s);
+    	}
+    }
     
+    public boolean isPlaying(String identifier)
+    {
+    	return soundSystem.playing(identifier);
+    }
+
     public static SoundPlayer getInstance()
 	{
     	init();

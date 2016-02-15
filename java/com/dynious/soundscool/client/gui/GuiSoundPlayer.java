@@ -106,21 +106,26 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         		}
         	}
         	
-        	String name = selectedSound.getSoundName();
-            this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
+        	if (selectedSound.getSoundLocation() != null || selectedSound.getState().equals(SoundState.DOWNLOADING))
+        	{
+        		String name = selectedSound.getSoundName();
+        		this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
 
-            SoundState downloaded = selectedSound.getState();
-            this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
+        		SoundState downloaded = selectedSound.getState();
+        		this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
 
-            String category = selectedSound.getCategory();
-            this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 90, 0xFFFFFF);
-
-            if (selectedSound.getSoundLocation() != null)
+        		String category = selectedSound.getCategory();
+        		this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 90, 0xFFFFFF);
+        	}
+        	if (selectedSound.getSoundLocation() != null)
             {
-                String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
-                this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 120, 0xFFFFFF);
-            }
+        		String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
+        		this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 120, 0xFFFFFF);
+        	}
         }
+        else
+        	selectedSound = tile.getSelectedSound();
+        
         updateButtons();
 
         if(pause == true && (mc.isGamePaused() || mc.getIntegratedServer() == null))
@@ -203,6 +208,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 case 1:
                 	if(playButton.displayString.equals("Stop Sound"))
                 		stopSound();
+                	else if(selectedSound.equals(tile.getSelectedSound()))
+                		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
                 	else
                 		playSound();
                     break;
@@ -291,11 +298,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     
     private void playSound()
     {
-    	if(selectedSound.equals(tile.getSelectedSound()))
-    	{
-    		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));	
-    	}
-    	else if(selectedSound != null)
+    	if(selectedSound != null && !selectedSound.equals(tile.getSelectedSound()))
     	{
     		currentSoundID = UUID.randomUUID().toString();
     		timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
@@ -339,8 +342,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         	selectedSound = SoundHandler.getSounds().get(selected);
         	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
         		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-        	
-        	playSound();
+        	else
+        		playSound();
         }
         else
         	selectedSound = null;

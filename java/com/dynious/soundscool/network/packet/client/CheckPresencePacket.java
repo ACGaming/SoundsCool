@@ -1,15 +1,11 @@
 package com.dynious.soundscool.network.packet.client;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
@@ -25,12 +21,10 @@ public class CheckPresencePacket implements IMessage
     {
     }
 
-    public CheckPresencePacket(String soundName, String category, EntityPlayer player)
+    public CheckPresencePacket(String soundName, String category)
     {
         this.fileName = soundName;
         this.category = category;
-        this.entityID = player.getEntityId();
-        this.worldID = player.getEntityWorld().provider.getDimensionId();
     }
 
     @Override
@@ -51,24 +45,6 @@ public class CheckPresencePacket implements IMessage
             catCars[i] = bytes.readChar();
         }
         category = String.valueOf(catCars);
-        
-        entityID = bytes.readInt();
-        worldID = bytes.readInt();
-
-        Entity entity = DimensionManager.getWorld(worldID).getEntityByID(entityID);
-        if (entity != null && entity instanceof EntityPlayer)
-        {
-            Sound sound = SoundHandler.getSound(fileName, category);
-
-            if (sound != null)
-            {
-                NetworkHelper.serverSoundUpload(sound, (EntityPlayerMP) entity);
-            }
-            else
-            {
-                SoundsCool.network.sendTo(new SoundNotFoundPacket(fileName), (EntityPlayerMP)entity);
-            }
-        }
     }
 
     @Override
@@ -85,14 +61,26 @@ public class CheckPresencePacket implements IMessage
         {
             bytes.writeChar(c);
         }
-        
-        bytes.writeInt(entityID);
-        bytes.writeInt(worldID);
     }
     
     public static class Handler implements IMessageHandler<CheckPresencePacket, IMessage> {
         @Override
-        public IMessage onMessage(CheckPresencePacket message, MessageContext ctx) {
+        public IMessage onMessage(CheckPresencePacket message, MessageContext ctx) 
+        {  	
+        	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            if (player != null)
+            {
+                Sound sound = SoundHandler.getSound(message.fileName, message.category);
+
+                if (sound != null)
+                {
+                    NetworkHelper.serverSoundUpload(sound, player);
+                }
+                else
+                {
+                	return new SoundNotFoundPacket(message.fileName);
+                }
+            }
             return null;
         }
     }
