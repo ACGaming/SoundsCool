@@ -13,6 +13,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -128,7 +129,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         
         updateButtons();
 
-        if(pause == true && (mc.isGamePaused() || mc.getIntegratedServer() == null))
+        IntegratedServer server = mc.getIntegratedServer();
+        if(pause == true && (mc.isGamePaused() || server == null || (server != null && server.getPublic())))
         	selectingFromSystem();
         
         if(tile.isInvalid())
