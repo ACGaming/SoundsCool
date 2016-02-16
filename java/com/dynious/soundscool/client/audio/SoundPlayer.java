@@ -11,6 +11,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import paulscode.sound.SoundSystem;
 
+import com.dynious.soundscool.helper.SoundHelper;
+
 @SideOnly(Side.CLIENT)
 public class SoundPlayer
 {
@@ -33,7 +35,14 @@ public class SoundPlayer
     {
         try
         {
-            soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
+        	if(SoundHelper.getSoundLength(sound) > 60)
+        	{
+        		soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
+        	}
+        	else
+        	{
+        		soundSystem.newSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
+        	}
             soundSystem.play(identifier);
             playing.add(identifier);
         }
@@ -42,10 +51,17 @@ public class SoundPlayer
             e.printStackTrace();
         }
     }
+    
+    public void removeSound(String identifier, String fileName)
+    {
+    	stopSound(identifier);
+		soundSystem.removeSource(identifier);
+    	soundSystem.unloadSound(fileName);
+    }
 
     public void stopSound(String identifier)
     {
-    	if(soundSystem.playing(identifier))
+    	if(isPlaying(identifier))
     	{
     		soundSystem.stop(identifier);
     		playing.remove(identifier);
@@ -57,6 +73,7 @@ public class SoundPlayer
     	for(String s : playing)
     	{
     		soundSystem.stop(s);
+    		soundSystem.removeSource(s);
     	}
     	playing = new ArrayList<String>();
     }

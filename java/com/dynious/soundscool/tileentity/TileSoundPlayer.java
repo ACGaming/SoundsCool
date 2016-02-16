@@ -16,6 +16,7 @@ import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.network.packet.client.SoundPlayerSelectPacket;
 import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
+import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.sound.Sound;
 
@@ -56,7 +57,10 @@ public class TileSoundPlayer extends TileEntity implements ITickable
 
     public Sound getSelectedSound()
     {
-        return selectedSound;
+    	if(selectedSound != null)
+    		return SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory());
+    	else
+    		return null;
     }
 
     public void playCurrentSound()
@@ -103,6 +107,11 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     	return System.currentTimeMillis() < timeSoundFinishedPlaying;
     }
     
+    public String getIdentifier()
+    {
+    	return lastSoundIdentifier;
+    }
+    
     private void reset()
     {
     	stopCurrentSound();
@@ -126,10 +135,12 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     	{
     		if(selectedSound != null && SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory())==null)
     		{
+    			TargetPoint targetPoint = new TargetPoint(worldObj.provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 8);
+                SoundsCool.network.sendToAllAround(new SoundRemovedPacket(selectedSound.getSoundName(), selectedSound.getCategory()), targetPoint);
     			reset();
     		}
     	}
-    	count = ++count % 200;
+    	count = ++count % 50;
     }
     
     private void sync()
@@ -188,7 +199,6 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         if(selectedSound == null && soundName.length() != 0 && category.length() != 0)
         {
         	selectedSound = new Sound(soundName, category);
-        	SoundHandler.addRemoteSound(soundName, category);
         }
         this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
         this.lastSoundIdentifier = pkt.getNbtCompound().getString("lastSoundIdentifier");

@@ -26,7 +26,7 @@ public class NetworkHelper
     public static void syncPlayerSounds(EntityPlayer player)
     {
     	SoundHandler.findSounds();
-    	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket(player));
+    	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)

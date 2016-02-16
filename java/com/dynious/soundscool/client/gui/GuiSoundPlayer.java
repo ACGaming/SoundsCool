@@ -81,6 +81,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         
         this.buttonList.add(new GuiButton(0, getWidth() / 2, getHeight() - 32, I18n.format("gui.done")));
         this.buttonList.add(playButton = new GuiButton(1, getWidth() / 2, getHeight() - 57, "Play Sound"));
+        playButton.enabled = false;
         
         GuiButton fileButton = new GuiButton(2, 10, getHeight() - 32, 150, 20, "Select File");
         this.buttonList.add(fileButton);
@@ -88,6 +89,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             fileButton.enabled = false;
         
         this.buttonList.add(uploadButton = new GuiButton(3, getWidth() / 2, getHeight() - 82, "Upload"));
+        uploadButton.enabled = false;
     }
 
     @Override
@@ -106,20 +108,18 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         			selectedSound = tileSound;
         		}
         	}
+
+        	String name = selectedSound.getSoundName();
+        	this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
+
+        	SoundState downloaded = selectedSound.getState();
+        	this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
+
+        	String category = selectedSound.getCategory();
+        	this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 90, 0xFFFFFF);
         	
-        	if (selectedSound.getSoundLocation() != null || selectedSound.getState().equals(SoundState.DOWNLOADING))
-        	{
-        		String name = selectedSound.getSoundName();
-        		this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
-
-        		SoundState downloaded = selectedSound.getState();
-        		this.getFontRenderer().drawString(downloaded.name(), getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(downloaded.name())/2), 60, 0x00FF00);
-
-        		String category = selectedSound.getCategory();
-        		this.getFontRenderer().drawString(category, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(category)/2), 90, 0xFFFFFF);
-        	}
         	if (selectedSound.getSoundLocation() != null)
-            {
+        	{
         		String space = FileUtils.byteCountToDisplaySize(selectedSound.getSoundLocation().length());
         		this.getFontRenderer().drawString(space, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(space)/2), 120, 0xFFFFFF);
         	}
@@ -236,30 +236,23 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     			}
                     			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
                     			stopSound();
-                    		}
-                    		else
-                    		{
-                    			SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
-                    			SoundHandler.removeSound(selectedSound);
-                    			selectSoundIndex(-1);
+                    			return;
                     		}
                     	}
-                    	else
+                    	else if(!SoundHandler.getLocalSounds().contains(selectedSound))
                     	{
-                    		if(!SoundHandler.getLocalSounds().contains(selectedSound))
-                    		{
-                    			selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    			SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getCategory(), selectedSound.getSoundLocation());
+                    		selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
+                    		SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getCategory(), selectedSound.getSoundLocation());
 
-                    			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-                            	stopSound();
-                    		}
-                    		else
-                    		{
-                    			SoundHandler.removeSound(selectedSound);
-                    			selectSoundIndex(-1);
-                    		}
+                    		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
+                    		stopSound();
+                    		return;
                     	}
+
+                    	SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
+                    	selectedSound.setState(SoundState.LOCAL_ONLY);
+                    	SoundHandler.clientRemoveSound(selectedSound, tile.getIdentifier());
+                    	selectSoundIndex(-1);
                     }
                     break;
             }

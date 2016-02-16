@@ -89,7 +89,7 @@ public class SoundUploadedPacket implements IMessage
         public IMessage onMessage(SoundUploadedPacket message, MessageContext ctx) {
         	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
         	int dimension = player.dimension;
-        	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 64);
+        	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 8);
         	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.soundName, message.category)), targetPoint);
             return null;
         }

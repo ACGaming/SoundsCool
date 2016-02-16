@@ -86,15 +86,18 @@ public class SoundHandler
         }
         addSoundsFromDir(soundsFolder);
     }
+    
+    public static void clientRemoveSound(Sound sound, String identifier)
+    {
+    	SoundPlayer.getInstance().removeSound(identifier, sound.getSoundName());
+    	removeSound(sound);
+    }
 
     public static void removeSound(Sound sound)
     {
         if (sound != null && sound.getSoundLocation() != null)
         {
-            if (!sound.getSoundLocation().delete())
-            {
-                sound.getSoundLocation().deleteOnExit();
-            }
+            sound.getSoundLocation().delete();
             sounds.remove(sound);
         }
     }
@@ -163,6 +166,8 @@ public class SoundHandler
         else
         {
             sound.setState(Sound.SoundState.LOCAL_ONLY);
+            sounds.remove(sound);
+            sounds.add(sound);
         }
     }
 
