@@ -69,14 +69,12 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         {
             if (!isPlaying())
             {
-            	String name = selectedSound.getSoundName();
-            	String category = selectedSound.getCategory();
-                if (SoundHandler.getSound(name, category) != null)
+                if (SoundHandler.getSounds().contains(selectedSound))
                 {
                     lastSoundIdentifier = UUID.randomUUID().toString();
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
                     TargetPoint tp = new TargetPoint(getWorld().provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 64);
-                    SoundsCool.network.sendToAllAround(new ServerPlaySoundPacket(name, category, lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()), tp);
+                    SoundsCool.network.sendToAllAround(new ServerPlaySoundPacket(selectedSound.getSoundName(), selectedSound.getCategory(), lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()), tp);
                 }
                 else
                 {
@@ -133,7 +131,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
 		}
     	else if(count == 0)
     	{
-    		if(selectedSound != null && SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory())==null)
+    		if(selectedSound != null && !SoundHandler.getSounds().contains(selectedSound))
     		{
     			TargetPoint targetPoint = new TargetPoint(worldObj.provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 8);
                 SoundsCool.network.sendToAllAround(new SoundRemovedPacket(selectedSound.getSoundName(), selectedSound.getCategory()), targetPoint);
