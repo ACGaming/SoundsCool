@@ -2,6 +2,7 @@ package com.dynious.soundscool.client.gui;
 
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.swing.JDialog;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraftforge.fml.client.GuiScrollingList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -24,6 +26,7 @@ import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.helper.SoundHelper;
+import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.network.packet.client.RemoveSoundPacket;
 import com.dynious.soundscool.network.packet.client.SoundPlayerPlayPacket;
 import com.dynious.soundscool.sound.Sound;
@@ -33,20 +36,20 @@ import com.dynious.soundscool.tileentity.TileSoundPlayer;
 @SideOnly(Side.CLIENT)
 public class GuiSoundPlayer extends GuiScreen implements IListGui
 {
-    private GuiSoundsList soundsListGui;
+    private GuiScrollingList soundsListGui;
     private TileSoundPlayer tile;
-    private GuiButton playButton;
+    private GuiButton playButton, uploadButton, listButton;
     private JFileChooser fileChooser;
-    private GuiButton uploadButton;
     private String currentSoundID;
     private long timeSoundFinishedPlaying;
-    private Sound selectedSound;
+    public Sound selectedSound;
     private boolean pause = false;
+    private ArrayList<Sound> sounds;
 
     public GuiSoundPlayer(TileSoundPlayer tile)
     {
         this.tile = tile;
-        
+
         selectedSound = tile.getSelectedSound(); 
         NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);  
          
@@ -77,19 +80,35 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public void initGui()
     {
         super.initGui();
-        soundsListGui = new GuiSoundsList(this, 150);
         
         this.buttonList.add(new GuiButton(0, getWidth() / 2, getHeight() - 32, I18n.format("gui.done")));
         this.buttonList.add(playButton = new GuiButton(1, getWidth() / 2, getHeight() - 57, "Play Sound"));
         playButton.enabled = false;
         
-        GuiButton fileButton = new GuiButton(2, 10, getHeight() - 32, 150, 20, "Select File");
+        GuiButton fileButton = new GuiButton(2, 10, getHeight() - 32, getWidth() / 3, 20, "Select File");
         this.buttonList.add(fileButton);
         if (fileChooser == null)
             fileButton.enabled = false;
         
         this.buttonList.add(uploadButton = new GuiButton(3, getWidth() / 2, getHeight() - 82, "Upload"));
         uploadButton.enabled = false;
+        
+        this.buttonList.add(listButton = new GuiButton(4, 10, 10, getWidth() / 3, 20, "Local Sounds"));
+        
+        if(sounds == null)
+        {
+        	soundsListGui = new GuiLocalSoundsList(this, getWidth() / 3);
+        	sounds = SoundHandler.getLocalSounds();
+        }
+        else if(soundsListGui.getClass().equals(GuiLocalSoundsList.class))
+        {
+        	soundsListGui = new GuiLocalSoundsList(this, getWidth() / 3);
+        }
+        else
+        {
+        	soundsListGui = new GuiRemoteSoundsList(this, getWidth() / 3);
+        	listButton.displayString = "Remote Sounds";
+        }
     }
 
     @Override
@@ -210,10 +229,10 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 case 1:
                 	if(playButton.displayString.equals("Stop Sound"))
                 		stopSound();
+                	else if(selectedSound.getState() == SoundState.LOCAL_ONLY)
+                		playSound();
                 	else if(selectedSound.equals(tile.getSelectedSound()))
                 		SoundsCool.network.sendToServer(new SoundPlayerPlayPacket(tile));
-                	else
-                		playSound();
                     break;
                 case 2:
                 	pause = true;
@@ -255,6 +274,19 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     	selectSoundIndex(-1);
                     }
                     break;
+                case 4:
+                	if(listButton.displayString.equals("Local Sounds"))
+                	{
+                		listButton.displayString = "Remote Sounds";
+                		soundsListGui = new GuiRemoteSoundsList(this, getWidth() / 3);
+                		sounds = SoundHandler.guiRemoteList;
+                	}
+                	else
+                	{
+                		listButton.displayString = "Local Sounds";
+                		soundsListGui = new GuiLocalSoundsList(this, getWidth() / 3);
+                		sounds = SoundHandler.getLocalSounds();
+                	}
             }
     }
     
@@ -274,26 +306,26 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         {
             selectSoundIndex(-1);
             selectedSound = new Sound(fileChooser.getSelectedFile());
-            if(!SoundHandler.getSounds().contains(selectedSound))
+            if(!sounds.contains(selectedSound))
             {
             	selectedSound.setCategory(mc.thePlayer.getDisplayName().getUnformattedText());
-            	if(SoundHandler.getSounds().contains(selectedSound))
+            	if(sounds.contains(selectedSound))
             	{
-            		selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+            		selectSoundIndex(sounds.indexOf(selectedSound));
             	}
             	else
             		playSound();
             }
             else
             {
-            	selectSoundIndex(SoundHandler.getSounds().indexOf(selectedSound));
+            	selectSoundIndex(sounds.indexOf(selectedSound));
             }
         }
     }
     
     private void playSound()
     {
-    	if(selectedSound != null && !selectedSound.equals(tile.getSelectedSound()))
+    	if(selectedSound != null)
     	{
     		currentSoundID = UUID.randomUUID().toString();
     		timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
@@ -332,13 +364,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public void selectSoundIndex(int selected)
     {
     	stopSound();
-        if (selected >= 0 && selected < SoundHandler.getSounds().size())
+        if (selected >= 0 && selected < sounds.size())
         {
-        	selectedSound = SoundHandler.getSounds().get(selected);
-        	if(selectedSound.hasRemote() || mc.isIntegratedServerRunning())
-        		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-        	else
-        		playSound();
+        	selectedSound = sounds.get(selected); 	
+        	tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
+        	SoundsCool.network.sendToServer(new CheckPresencePacket(selectedSound.getSoundName(), selectedSound.getCategory(), false));
         }
         else
         	selectedSound = null;
@@ -347,7 +377,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     @Override
     public boolean soundIndexSelected(int var1)
     {
-        return SoundHandler.getSounds().indexOf(selectedSound) == var1;
+    	return sounds.indexOf(selectedSound) == var1;
     }
 
     @Override

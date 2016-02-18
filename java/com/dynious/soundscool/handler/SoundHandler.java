@@ -22,6 +22,8 @@ public class SoundHandler
 {
     private static File soundsFolder;
     private static ArrayList<Sound> sounds = new ArrayList<Sound>();
+    public static int serverListSize = 0;
+    public static ArrayList<Sound> guiRemoteList = new ArrayList<Sound>();
 
     public static File getSoundsFolder()
     {
@@ -193,7 +195,7 @@ public class SoundHandler
         {
             sound.setState(Sound.SoundState.DOWNLOADING);
             DelayedPlayHandler.addDelayedPlay(soundName, category, identifier, x, y, z);
-            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category));
+            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category, true));
         }
     }
     @SideOnly(Side.CLIENT)

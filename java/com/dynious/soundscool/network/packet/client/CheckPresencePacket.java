@@ -9,22 +9,23 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
+import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 import com.dynious.soundscool.sound.Sound;
 
 public class CheckPresencePacket implements IMessage
 {
     String fileName, category;
-    int entityID;
-    int worldID;
+    boolean request;
 
     public CheckPresencePacket()
     {
     }
 
-    public CheckPresencePacket(String soundName, String category)
+    public CheckPresencePacket(String soundName, String category, boolean request)
     {
         this.fileName = soundName;
         this.category = category;
+        this.request = request;
     }
 
     @Override
@@ -45,6 +46,8 @@ public class CheckPresencePacket implements IMessage
             catCars[i] = bytes.readChar();
         }
         category = String.valueOf(catCars);
+        
+        request = bytes.readBoolean();
     }
 
     @Override
@@ -61,6 +64,8 @@ public class CheckPresencePacket implements IMessage
         {
             bytes.writeChar(c);
         }
+        
+        bytes.writeBoolean(request);
     }
     
     public static class Handler implements IMessageHandler<CheckPresencePacket, IMessage> {
@@ -72,11 +77,15 @@ public class CheckPresencePacket implements IMessage
             {
                 Sound sound = SoundHandler.getSound(message.fileName, message.category);
 
-                if (sound != null)
+                if (sound != null && message.request)
                 {
                     NetworkHelper.serverSoundUpload(sound, player);
                 }
-                else
+                else if(sound != null)
+                {
+                	return new SoundReceivedPacket(new Sound(message.fileName, message.category));
+                }
+                else 
                 {
                 	return new SoundNotFoundPacket(message.fileName);
                 }

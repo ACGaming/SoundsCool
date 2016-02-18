@@ -10,15 +10,27 @@ import com.dynious.soundscool.sound.Sound;
 
 public class UploadedSoundsPacket implements IMessage
 {
+	private int start, finish;
+	
     public UploadedSoundsPacket()
     {
+    }
+    
+    public UploadedSoundsPacket(int start, int finish)
+    {
+    	this.start = start;
+    	this.finish = finish;
     }
 
     @Override
     public void fromBytes(ByteBuf bytes)
     {
-        int sounds = bytes.readInt();
-        for (int y = 0; y < sounds; y++)
+    	SoundHandler.serverListSize = bytes.readInt();
+        this.start = bytes.readInt();
+        this.finish = bytes.readInt();
+        
+        SoundHandler.guiRemoteList.clear();
+        for (int y = start; y < finish; y++)
         {
             int soundNameLength = bytes.readInt();
             char[] soundNameCars = new char[soundNameLength];
@@ -33,15 +45,21 @@ public class UploadedSoundsPacket implements IMessage
                 soundCatChars[i] = bytes.readChar();
             }
             SoundHandler.addRemoteSound(String.valueOf(soundNameCars), String.valueOf(soundCatChars));
+            SoundHandler.guiRemoteList.add(new Sound(String.valueOf(soundNameCars), String.valueOf(soundCatChars)));
         }
     }
 
     @Override
     public void toBytes(ByteBuf bytes)
     {
-        bytes.writeInt(SoundHandler.getSounds().size());
-        for (Sound sound : SoundHandler.getSounds())
+    	int size = SoundHandler.getSounds().size();
+    	bytes.writeInt(size);
+        bytes.writeInt(start);
+        finish = finish < size ? finish : size-1;
+        bytes.writeInt(finish);
+        for (int i=start; i<finish; i++)
         {
+        	Sound sound = SoundHandler.getSounds().get(i);
             bytes.writeInt(sound.getSoundName().length());
             for (char c : sound.getSoundName().toCharArray())
             {

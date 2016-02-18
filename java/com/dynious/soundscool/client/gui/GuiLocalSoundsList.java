@@ -12,7 +12,7 @@ public class GuiLocalSoundsList extends GuiScrollingList
 
     public GuiLocalSoundsList(IListGui parent, int listWidth)
     {
-        super(parent.getMinecraftInstance(), listWidth, parent.getWidth(), 32, parent.getHeight() - 64, 10, 35);
+        super(parent.getMinecraftInstance(), listWidth, parent.getWidth(), 30, parent.getHeight() - 32, 10, 35);
         this.parent = parent;
     }
 
@@ -53,7 +53,7 @@ public class GuiLocalSoundsList extends GuiScrollingList
         if (sound != null)
         {
             this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.getSoundName(), listWidth - 10), this.left + 3 , var3 + 2, 0xFFFFFF);
-            this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.hasRemote()? "Uploaded": "Not uploaded", listWidth - 10), this.left + 3 , var3 + 12, 0xCCCCCC);
+            this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.getCategory(), listWidth - 10), this.left + 3 , var3 + 12, 0xCCCCCC);
         }
     }
 }

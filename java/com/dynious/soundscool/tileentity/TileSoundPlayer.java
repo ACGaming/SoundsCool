@@ -49,10 +49,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         {
         	SoundsCool.network.sendToServer(new SoundPlayerSelectPacket(this));
         }
-        else
-        {
-        	playCurrentSound();
-        }
+        sync();
     }
 
     public Sound getSelectedSound()
@@ -193,11 +190,20 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     {
         String soundName = pkt.getNbtCompound().getString("name");
         String category = pkt.getNbtCompound().getString("category");
-        selectedSound = SoundHandler.getSound(soundName, category);
-        if(selectedSound == null && soundName.length() != 0 && category.length() != 0)
+        
+        if((selectedSound != null && !selectedSound.equals(new Sound(soundName, category))) || selectedSound == null)
         {
-        	selectedSound = new Sound(soundName, category);
+        	selectedSound = SoundHandler.getSound(soundName, category);
+        	if(soundName.length() != 0 && category.length() != 0)
+        	{
+        		if(selectedSound == null)
+        		{
+        			selectedSound = new Sound(soundName, category);
+        		}
+        		SoundHandler.addRemoteSound(soundName, category);
+        	}
         }
+        
         this.timeSoundFinishedPlaying = pkt.getNbtCompound().getLong("timeSoundFinishedPlaying");
         this.lastSoundIdentifier = pkt.getNbtCompound().getString("lastSoundIdentifier");
     }

@@ -16,7 +16,6 @@ import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.SoundChunkPacket;
 import com.dynious.soundscool.network.packet.SoundUploadedPacket;
-import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
 import com.dynious.soundscool.sound.Sound;
 
 public class NetworkHelper
@@ -26,7 +25,6 @@ public class NetworkHelper
     public static void syncPlayerSounds(EntityPlayer player)
     {
     	SoundHandler.findSounds();
-    	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket());
     }
 
     @SideOnly(Side.CLIENT)
