@@ -1,5 +1,8 @@
 package com.dynious.soundscool;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -34,8 +37,12 @@ public class SoundsCool
     public void preInit(FMLPreInitializationEvent event)
     {
     	proxy.registerMessages();
-    	
+
     	proxy.soundSetup();
+    	
+    	Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
+    	Logger.getLogger("org.jaudiotagger.audio").setLevel(Level.OFF);
+    	Logger.getLogger("org.jaudiotagger.tag.id3").setLevel(Level.OFF);
 
         proxy.UISetup();
 

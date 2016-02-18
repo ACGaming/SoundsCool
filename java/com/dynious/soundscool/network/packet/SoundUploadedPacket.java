@@ -22,49 +22,57 @@ import com.dynious.soundscool.sound.Sound;
 
 public class SoundUploadedPacket implements IMessage
 {
-    String category;
-    String soundName;
+    String title, artist, fileName;
     public SoundUploadedPacket()
     {
     }
 
-    public SoundUploadedPacket(String soundName, String category)
+    public SoundUploadedPacket(String title, String artist, String fileName)
     {
-        this.category = category;
-        this.soundName = soundName;
+    	this.title = title;
+        this.artist = artist;
+        this.fileName = fileName;
     }
 
     @Override
     public void fromBytes(ByteBuf bytes)
     {
-        int catLength = bytes.readInt();
-        char[] catCars = new char[catLength];
-        for (int i = 0; i < catLength; i++)
+        int titleLength = bytes.readInt();
+        char[] titleChars = new char[titleLength];
+        for (int i = 0; i < titleLength; i++)
         {
-            catCars[i] = bytes.readChar();
+            titleChars[i] = bytes.readChar();
         }
-        category = String.valueOf(catCars);
+        title = String.valueOf(titleChars);
 
-        int fileLength = bytes.readInt();
-        char[] fileCars = new char[fileLength];
-        for (int i = 0; i < fileLength; i++)
+        int artistLength = bytes.readInt();
+        char[] artistChars = new char[artistLength];
+        for (int i = 0; i < artistLength; i++)
         {
-            fileCars[i] = bytes.readChar();
+            artistChars[i] = bytes.readChar();
         }
-        soundName = String.valueOf(fileCars);
+        artist = String.valueOf(artistChars);
+        
+        int fileNameLength = bytes.readInt();
+        char[] fileNameChars = new char[fileNameLength];
+        for (int i = 0; i < fileNameLength; i++)
+        {
+        	fileNameChars[i] = bytes.readChar();
+        }
+        fileName = String.valueOf(fileNameChars);
 
-        File soundFile = NetworkHelper.createFileFromByteArr(NetworkHandler.soundUploaded(soundName), category, soundName);
-        SoundHandler.addLocalSound(soundName, category, soundFile);
+        File soundFile = NetworkHelper.createFileFromByteArr(NetworkHandler.soundUploaded(title), artist, fileName);
+        SoundHandler.addLocalSound(title, artist, soundFile);
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            DelayedPlayHandler.onSoundReceived(soundName, category);
+            DelayedPlayHandler.onSoundReceived(title, artist);
         }
         else
         {
-            EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(category);
+            EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(artist);
             if (player != null)
             {
-                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(soundName, category)), player);
+                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(title, artist)), player);
             }
         }
     }
@@ -72,13 +80,18 @@ public class SoundUploadedPacket implements IMessage
     @Override
     public void toBytes(ByteBuf bytes)
     {
-        bytes.writeInt(category.length());
-        for (char c : category.toCharArray())
+        bytes.writeInt(title.length());
+        for (char c : title.toCharArray())
         {
             bytes.writeChar(c);
         }
-        bytes.writeInt(soundName.length());
-        for (char c : soundName.toCharArray())
+        bytes.writeInt(artist.length());
+        for (char c : artist.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        bytes.writeInt(fileName.length());
+        for (char c : fileName.toCharArray())
         {
             bytes.writeChar(c);
         }
@@ -90,7 +103,7 @@ public class SoundUploadedPacket implements IMessage
         	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
         	int dimension = player.dimension;
         	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 8);
-        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.soundName, message.category)), targetPoint);
+        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.title, message.artist)), targetPoint);
             return null;
         }
     }

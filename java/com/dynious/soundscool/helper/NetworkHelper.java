@@ -46,7 +46,7 @@ public class NetworkHelper
         		byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
         		SoundsCool.network.sendTo(new SoundChunkPacket(sound.getSoundName(), bytes), player);
         	}
-        	SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory()), player);
+        	SoundsCool.network.sendTo(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory(), sound.getSoundLocation().getName()), player);
         }
     }
 
@@ -60,7 +60,7 @@ public class NetworkHelper
         		byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
         		SoundsCool.network.sendToServer(new SoundChunkPacket(sound.getSoundName(), bytes));
         	}
-        	SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), category));
+        	SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), category, sound.getSoundLocation().getName()));
         }
     }
 

@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.client.audio.SoundPlayer;
 import com.dynious.soundscool.helper.SoundHelper;
+import com.dynious.soundscool.helper.TagInfo;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.sound.Sound;
@@ -62,14 +62,14 @@ public class SoundHandler
         return remoteSounds;
     }
 
-    public static Sound getSound(String fileName, String category)
+    public static Sound getSound(String title, String category)
     {
     	Iterator<Sound> iter = sounds.iterator();
 
     	while (iter.hasNext()) {
     	    Sound sound = iter.next();
 
-    	    if(sound.getSoundName().equals(fileName) && sound.getCategory().equals(category))
+    	    if(sound.getSoundName().equals(title) && sound.getCategory().equals(category))
             {
                 return sound;
             }
@@ -89,7 +89,7 @@ public class SoundHandler
     
     public static void clientRemoveSound(Sound sound, String identifier)
     {
-    	SoundPlayer.getInstance().removeSound(identifier, sound.getSoundName());
+    	SoundPlayer.getInstance().removeSound(identifier, sound.getSoundLocation().getName());
     	removeSound(sound);
     }
 
@@ -199,12 +199,14 @@ public class SoundHandler
     @SideOnly(Side.CLIENT)
     public static Sound setupSound(File file)
     {
-        File category = new File("sounds" + File.separator + Reference.name + File.separator + Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText());
+    	TagInfo tagInfo = SoundHelper.getTagInfo(file);
+        File category = new File("sounds" + File.separator + Reference.name + File.separator + tagInfo.getArtist());
         if (!category.exists())
         {
             category.mkdirs();
         }
-        File newFile = new File(category.getAbsolutePath() + File.separator + file.getName());
+        
+        File newFile = new File(category.getAbsolutePath() + File.separator + tagInfo.getTitle());
         try
         {
             //TODO: FIXXXX

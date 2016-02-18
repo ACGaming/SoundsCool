@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import paulscode.sound.SoundSystem;
 
-import com.dynious.soundscool.helper.SoundHelper;
-
 @SideOnly(Side.CLIENT)
 public class SoundPlayer
 {
@@ -35,14 +33,7 @@ public class SoundPlayer
     {
         try
         {
-        	if(SoundHelper.getSoundLength(sound) > 60)
-        	{
-        		soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
-        	}
-        	else
-        	{
-        		soundSystem.newSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
-        	}
+        	soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
             soundSystem.play(identifier);
             playing.add(identifier);
         }

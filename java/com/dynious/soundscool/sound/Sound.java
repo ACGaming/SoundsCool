@@ -2,6 +2,9 @@ package com.dynious.soundscool.sound;
 
 import java.io.File;
 
+import com.dynious.soundscool.helper.SoundHelper;
+import com.dynious.soundscool.helper.TagInfo;
+
 public class Sound implements Comparable
 {
     private File soundLocation;
@@ -12,11 +15,9 @@ public class Sound implements Comparable
     public Sound(File soundLocation)
     {
         this.soundLocation = soundLocation;
-        String path = soundLocation.getAbsolutePath();
-        path = path.substring(0, path.lastIndexOf(File.separator));
-        path = path.substring(path.lastIndexOf(File.separator) + 1);
-        this.category = path;
-        this.soundName = soundLocation.getName();
+        TagInfo tagInfo = SoundHelper.getTagInfo(soundLocation);
+        this.soundName = tagInfo.getTitle();
+        this.category = tagInfo.getArtist();
         this.state = SoundState.LOCAL_ONLY;
     }
 
@@ -61,10 +62,6 @@ public class Sound implements Comparable
     public void onSoundDownloaded(File soundFile)
     {
         this.soundLocation = soundFile;
-        String path = soundLocation.getAbsolutePath();
-        path = path.substring(0, path.lastIndexOf(File.separator));
-        path = path.substring(path.lastIndexOf(File.separator) + 1);
-        this.category = path;
         this.state = SoundState.SYNCED;
     }
 
