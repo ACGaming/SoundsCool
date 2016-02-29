@@ -51,7 +51,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         this.tile = tile;
 
         selectedSound = tile.getSelectedSound(); 
-        NetworkHelper.syncPlayerSounds(Minecraft.getMinecraft().thePlayer);  
+        SoundHandler.findSounds(); 
          
         try
         {

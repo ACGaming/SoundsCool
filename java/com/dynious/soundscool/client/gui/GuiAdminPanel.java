@@ -6,8 +6,6 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 
-import com.dynious.soundscool.helper.NetworkHelper;
-
 public class GuiAdminPanel extends GuiScreen
 {
     private EntityPlayer player;
@@ -16,7 +14,6 @@ public class GuiAdminPanel extends GuiScreen
     public GuiAdminPanel(EntityPlayer player)
     {
         this.player = player;
-        NetworkHelper.syncPlayerSounds(player);
     }
 
     @Override

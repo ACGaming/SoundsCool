@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,7 +23,7 @@ import com.google.common.io.Files;
 public class SoundHandler
 {
     private static File soundsFolder;
-    private static TreeMap<SoundInfo, Sound> localSounds = new TreeMap<SoundInfo, Sound>();
+    private static ConcurrentSkipListMap<SoundInfo, Sound> localSounds = new ConcurrentSkipListMap<SoundInfo, Sound>();
     private static TreeMap<SoundInfo, Sound> remoteSounds = new TreeMap<SoundInfo, Sound>();
     public static int serverListSize = 0;
     public static ArrayList<Sound> guiRemoteList = new ArrayList<Sound>();
@@ -36,7 +37,7 @@ public class SoundHandler
         return soundsFolder;
     }
 
-    public static TreeMap<SoundInfo, Sound> getLocalSounds()
+    public static ConcurrentSkipListMap<SoundInfo, Sound> getLocalSounds()
     {
         return localSounds;
     }
@@ -61,7 +62,14 @@ public class SoundHandler
         {
             soundsFolder.mkdir();
         }
-        addSoundsFromDir(soundsFolder);
+        new Thread()
+        {
+        	public void run() 
+        	{
+        		addSoundsFromDir(soundsFolder); 
+        	};
+        }.start();
+
     }
     
     public static void clientRemoveSound(Sound sound, String identifier)
@@ -178,7 +186,7 @@ public class SoundHandler
     
     public static void reset()
     {
-    	localSounds = new TreeMap<SoundInfo, Sound>();
+    	localSounds = new ConcurrentSkipListMap<SoundInfo, Sound>();
     	remoteSounds = new TreeMap<SoundInfo, Sound>();
     	findSounds();
     }

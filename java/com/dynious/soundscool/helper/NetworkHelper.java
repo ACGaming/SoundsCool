@@ -3,7 +3,6 @@ package com.dynious.soundscool.helper;
 import java.io.File;
 import java.io.IOException;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import org.apache.commons.io.FileUtils;
@@ -19,11 +18,6 @@ import com.dynious.soundscool.sound.Sound;
 public class NetworkHelper
 {
     public static final int PARTITION_SIZE = 30000;
-    
-    public static void syncPlayerSounds(EntityPlayer player)
-    {
-    	SoundHandler.findSounds();
-    }
 
     public static void serverSoundUpload(Sound sound, EntityPlayerMP player)
     {
