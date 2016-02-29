@@ -11,6 +11,7 @@ import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundNotFoundPacket;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class CheckPresencePacket implements IMessage
 {
@@ -21,10 +22,10 @@ public class CheckPresencePacket implements IMessage
     {
     }
 
-    public CheckPresencePacket(String soundName, String category, boolean request)
+    public CheckPresencePacket(SoundInfo soundInfo, boolean request)
     {
-        this.fileName = soundName;
-        this.category = category;
+        this.fileName = soundInfo.name;
+        this.category = soundInfo.category;
         this.request = request;
     }
 
@@ -75,7 +76,8 @@ public class CheckPresencePacket implements IMessage
         	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
             if (player != null)
             {
-                Sound sound = SoundHandler.getSound(message.fileName, message.category);
+            	SoundInfo soundInfo = new SoundInfo(message.fileName, message.category);
+                Sound sound = SoundHandler.getSound(soundInfo);
 
                 if (sound != null && message.request)
                 {
@@ -83,11 +85,11 @@ public class CheckPresencePacket implements IMessage
                 }
                 else if(sound != null)
                 {
-                	return new SoundReceivedPacket(new Sound(message.fileName, message.category));
+                	return new SoundReceivedPacket(soundInfo);
                 }
                 else 
                 {
-                	return new SoundNotFoundPacket(message.fileName);
+                	return new SoundNotFoundPacket(soundInfo);
                 }
             }
             return null;

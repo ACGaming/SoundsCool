@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import com.dynious.soundscool.sound.SoundInfo;
 import com.dynious.soundscool.tileentity.TileSoundPlayer;
 
 public class SoundPlayerSelectPacket implements IMessage
@@ -60,7 +61,7 @@ public class SoundPlayerSelectPacket implements IMessage
             TileEntity tile = world.getTileEntity(new BlockPos(x,y,z));
             if (tile != null && tile instanceof TileSoundPlayer)
             {
-                ((TileSoundPlayer)tile).selectSound(soundName, category);
+                ((TileSoundPlayer)tile).selectSound(new SoundInfo(soundName, category));
             }
         }
     }

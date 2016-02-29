@@ -1,7 +1,11 @@
 package com.dynious.soundscool.client.gui;
 
+import java.util.ArrayList;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+
+import com.dynious.soundscool.sound.Sound;
 
 public interface IListGui
 {
@@ -18,4 +22,6 @@ public interface IListGui
     public int getHeight();
 
     public void drawBackground();
+    
+    public ArrayList<Sound> getSounds();
 }

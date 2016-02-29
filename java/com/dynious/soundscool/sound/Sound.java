@@ -5,7 +5,7 @@ import java.io.File;
 import com.dynious.soundscool.helper.SoundHelper;
 import com.dynious.soundscool.helper.TagInfo;
 
-public class Sound implements Comparable
+public class Sound
 {
     private File soundLocation;
     private String soundName;
@@ -21,11 +21,11 @@ public class Sound implements Comparable
         this.state = SoundState.LOCAL_ONLY;
     }
 
-    public Sound(String soundName, String category)
+    public Sound(SoundInfo soundInfo)
     {
         this.soundLocation = null;
-        this.soundName = soundName;
-        this.category = category;
+        this.soundName = soundInfo.name;
+        this.category = soundInfo.category;
         this.state = SoundState.REMOTE_ONLY;
     }
 
@@ -52,6 +52,11 @@ public class Sound implements Comparable
     public SoundState getState()
     {
         return state;
+    }
+    
+    public SoundInfo getSoundInfo()
+    {
+    	return new SoundInfo(soundName, category);
     }
 
     public void onSoundUploaded(String remoteCategory)
@@ -120,24 +125,5 @@ public class Sound implements Comparable
 		} else if (!soundName.equals(other.soundName))
 			return false;
 		return true;
-	}
-	
-	@Override
-	public int compareTo(Object obj)
-	{
-		if(obj == null)
-			throw new NullPointerException();
-		if(this == obj)
-			return 0;
-
-		Sound other = (Sound) obj;
-		int nameCompared = this.soundName.compareToIgnoreCase(other.soundName);
-
-		if(nameCompared == 0)
-		{
-			return this.category.compareToIgnoreCase(other.category);
-		}
-
-		return nameCompared;
 	}
 }

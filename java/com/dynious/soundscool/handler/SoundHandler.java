@@ -3,8 +3,7 @@ package com.dynious.soundscool.handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.TreeMap;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,12 +15,15 @@ import com.dynious.soundscool.helper.TagInfo;
 import com.dynious.soundscool.lib.Reference;
 import com.dynious.soundscool.network.packet.client.CheckPresencePacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.Sound.SoundState;
+import com.dynious.soundscool.sound.SoundInfo;
 import com.google.common.io.Files;
 
 public class SoundHandler
 {
     private static File soundsFolder;
-    private static ArrayList<Sound> sounds = new ArrayList<Sound>();
+    private static TreeMap<SoundInfo, Sound> localSounds = new TreeMap<SoundInfo, Sound>();
+    private static TreeMap<SoundInfo, Sound> remoteSounds = new TreeMap<SoundInfo, Sound>();
     public static int serverListSize = 0;
     public static ArrayList<Sound> guiRemoteList = new ArrayList<Sound>();
 
@@ -33,50 +35,23 @@ public class SoundHandler
         }
         return soundsFolder;
     }
-    public static ArrayList<Sound> getSounds()
-    {
-        if (sounds == null)
-        {
-            findSounds();
-        }
-        return sounds;
-    }
 
-    public static ArrayList<Sound> getLocalSounds()
+    public static TreeMap<SoundInfo, Sound> getLocalSounds()
     {
-        ArrayList<Sound> localSounds = new ArrayList<Sound>();
-        for (Sound sound : getSounds())
-        {
-            if (sound.hasLocal())
-                localSounds.add(sound);
-        }
         return localSounds;
     }
 
-    public static ArrayList<Sound> getRemoteSounds()
+    public static TreeMap<SoundInfo, Sound> getRemoteSounds()
     {
-        ArrayList<Sound> remoteSounds = new ArrayList<Sound>();
-        for (Sound sound : getSounds())
-        {
-            if (sound.hasRemote())
-                remoteSounds.add(sound);
-        }
         return remoteSounds;
     }
 
-    public static Sound getSound(String title, String category)
+    public static Sound getSound(SoundInfo soundInfo)
     {
-    	Iterator<Sound> iter = sounds.iterator();
-
-    	while (iter.hasNext()) {
-    	    Sound sound = iter.next();
-
-    	    if(sound.getSoundName().equals(title) && sound.getCategory().equals(category))
-            {
-                return sound;
-            }
-    	}
-        return null;
+    	Sound sound = localSounds.get(soundInfo);
+    	if(sound == null)
+    		return remoteSounds.get(soundInfo);
+    	return sound;
     }
 
     public static void findSounds()
@@ -91,8 +66,12 @@ public class SoundHandler
     
     public static void clientRemoveSound(Sound sound, String identifier)
     {
-    	SoundPlayer.getInstance().removeSound(identifier, sound.getSoundLocation().getName());
-    	removeSound(sound);
+    	if (sound != null && sound.getSoundLocation() != null)
+        {
+        	SoundPlayer.getInstance().removeSound(identifier, sound.getSoundLocation().getName());
+            sound.getSoundLocation().delete();
+            localSounds.remove(sound.getSoundInfo());
+        }
     }
 
     public static void removeSound(Sound sound)
@@ -100,7 +79,7 @@ public class SoundHandler
         if (sound != null && sound.getSoundLocation() != null)
         {
             sound.getSoundLocation().delete();
-            sounds.remove(sound);
+            remoteSounds.remove(sound.getSoundInfo());   		
         }
     }
 
@@ -113,8 +92,8 @@ public class SoundHandler
                 if (file.getName().endsWith(".ogg") || file.getName().endsWith(".wav") || file.getName().endsWith(".mp3"))
                 {
                 	Sound sound = new Sound(file);
-                	if(!sounds.contains(sound))
-                		sounds.add(sound);
+                	if(!localSounds.containsKey(sound.getSoundInfo()))
+                		localSounds.put(sound.getSoundInfo(), sound);
                 }
             }
             else if (file.isDirectory())
@@ -122,80 +101,50 @@ public class SoundHandler
                 addSoundsFromDir(file);
             }
         }
-        Collections.sort(sounds);
     }
 
-    public static void addRemoteSound(String soundName, String remoteCategory)
+    public static Sound addRemoteSound(SoundInfo soundInfo)
     {
-        Sound sound = getSound(soundName, remoteCategory);
-        if (sound != null)
-        {
-            if (sound.hasLocal())
-            {
-                sound.onSoundUploaded(remoteCategory);
-            }
-        }
-        else
-        {
-            sounds.add(new Sound(soundName, remoteCategory));
-            Collections.sort(sounds);
-        }
+    	Sound sound = new Sound(soundInfo);
+    	remoteSounds.put(soundInfo, sound);
+    	return sound;
     }
 
-    public static void addLocalSound(String soundName, String category, File soundFile)
+    public static void addLocalSound(SoundInfo soundInfo, Sound sound)
     {
-        Sound sound = getSound(soundName, category);
-        if (sound != null)
-        {
-            if (sound.getState() != Sound.SoundState.SYNCED)
-            {
-                sound.onSoundDownloaded(soundFile);
-            }
-        }
-        else
-        {
-            sounds.add(new Sound(soundFile));
-        }
-        Collections.sort(sounds);
+        localSounds.put(soundInfo, sound);
     }
 
-    public static void remoteRemovedSound(Sound sound)
+    public static void remoteRemovedSound(SoundInfo soundInfo)
     {
-        if (!sound.hasLocal())
-        {
-            sounds.remove(sound);
-        }
-        else
-        {
-            sound.setState(Sound.SoundState.LOCAL_ONLY);
-            sounds.remove(sound);
-            sounds.add(sound);
-        }
+        remoteSounds.remove(soundInfo);
+        
+        Sound localSound = localSounds.get(soundInfo);
+        if(localSound == null)
+        	return;
+        localSound.setState(SoundState.LOCAL_ONLY);
+        localSounds.put(soundInfo, localSound);
     }
 
     @SideOnly(Side.CLIENT)
-    public static void playSound(String soundName, String category, String identifier, int x, int y, int z)
+    public static void playSound(SoundInfo soundInfo, String identifier, int x, int y, int z)
     {
-        Sound sound = SoundHandler.getSound(soundName, category);
+        Sound sound = localSounds.get(soundInfo);
         if (sound != null)
         {
-            if (sound.hasLocal())
-            {
-                SoundPlayer.getInstance().playSound(sound.getSoundLocation(), identifier, x, y, z, true);
-                return;
-            }
+        	SoundPlayer.getInstance().playSound(sound.getSoundLocation(), identifier, x, y, z, true);
+            return;
         }
         else
         {
-            SoundHandler.addRemoteSound(soundName, category);
-            sound = SoundHandler.getSound(soundName, category);
+            sound = addRemoteSound(soundInfo);
         }
 
         if (sound.getState() != Sound.SoundState.DOWNLOADING)
         {
             sound.setState(Sound.SoundState.DOWNLOADING);
-            DelayedPlayHandler.addDelayedPlay(soundName, category, identifier, x, y, z);
-            SoundsCool.network.sendToServer(new CheckPresencePacket(soundName, category, true));
+            DelayedPlayHandler.addDelayedPlay(soundInfo, identifier, x, y, z);
+            SoundsCool.network.sendToServer(new CheckPresencePacket(soundInfo, true));
         }
     }
     @SideOnly(Side.CLIENT)
@@ -208,14 +157,13 @@ public class SoundHandler
             category.mkdirs();
         }
         
-        File newFile = new File(category.getAbsolutePath() + File.separator + tagInfo.getTitle());
+        File newFile = new File(category.getAbsolutePath() + File.separator + file.getName());
         try
         {
             //TODO: FIXXXX
             if ((!newFile.exists() || !Files.equal(file, newFile)) && !SoundHelper.isSoundInSoundsFolder(file))
             {
                 Files.copy(file, newFile);
-                findSounds();
             }
             else
             {
@@ -230,7 +178,8 @@ public class SoundHandler
     
     public static void reset()
     {
-    	sounds = new ArrayList<Sound>();
+    	localSounds = new TreeMap<SoundInfo, Sound>();
+    	remoteSounds = new TreeMap<SoundInfo, Sound>();
     	findSounds();
     }
 

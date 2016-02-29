@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -27,13 +25,6 @@ public class NetworkHelper
     	SoundHandler.findSounds();
     }
 
-    @SideOnly(Side.CLIENT)
-    public static void clientSoundUpload(Sound sound)
-    {
-        sound.setState(Sound.SoundState.UPLOADING);
-        uploadSound(sound, sound.getCategory());
-    }
-
     public static void serverSoundUpload(Sound sound, EntityPlayerMP player)
     {
         byte[] soundBytes = convertFileToByteArr(sound.getSoundLocation());
@@ -48,7 +39,7 @@ public class NetworkHelper
         }
     }
 
-    private static void uploadSound(Sound sound, String category)
+    public static void uploadSound(Sound sound)
     {
         byte[] soundBytes = convertFileToByteArr(sound.getSoundLocation());
         if(soundBytes != null)
@@ -58,7 +49,7 @@ public class NetworkHelper
         		byte[] bytes = ArrayUtils.subarray(soundBytes, i, i + Math.min(PARTITION_SIZE, soundBytes.length - i));
         		SoundsCool.network.sendToServer(new SoundChunkPacket(sound.getSoundName(), bytes));
         	}
-        	SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), category, sound.getSoundLocation().getName()));
+        	SoundsCool.network.sendToServer(new SoundUploadedPacket(sound.getSoundName(), sound.getCategory(), sound.getSoundLocation().getName()));
         }
     }
 

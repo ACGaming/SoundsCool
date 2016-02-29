@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.SoundHandler;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class ServerPlaySoundPacket implements IMessage
 {
@@ -15,10 +16,10 @@ public class ServerPlaySoundPacket implements IMessage
     {
     }
 
-    public ServerPlaySoundPacket(String soundName, String category, String identifier, int x, int y, int z)
+    public ServerPlaySoundPacket(SoundInfo soundInfo, String identifier, int x, int y, int z)
     {
-        this.soundName = soundName;
-        this.category = category;
+        this.soundName = soundInfo.name;
+        this.category = soundInfo.category;
         this.identifier = identifier;
         this.x = x;
         this.y = y;
@@ -55,7 +56,7 @@ public class ServerPlaySoundPacket implements IMessage
         x = bytes.readInt();
         y = bytes.readInt();
         z = bytes.readInt();
-        SoundHandler.playSound(soundName, category, identifier, x, y, z);
+        SoundHandler.playSound(new SoundInfo(soundName, category), identifier, x, y, z);
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class RemoveSoundPacket implements IMessage
 {
@@ -16,10 +17,10 @@ public class RemoveSoundPacket implements IMessage
     {
     }
 
-    public RemoveSoundPacket(String soundName, String category)
+    public RemoveSoundPacket(SoundInfo soundInfo)
     {
-        this.soundName = soundName;
-        this.category = category;
+        this.soundName = soundInfo.name;
+        this.category = soundInfo.category;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class RemoveSoundPacket implements IMessage
         }
         category = String.valueOf(catCars);
 
-        Sound sound = SoundHandler.getSound(soundName, category);
+        Sound sound = SoundHandler.getSound(new SoundInfo(soundName, category));
         SoundHandler.removeSound(sound);
 
     }

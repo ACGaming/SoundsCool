@@ -19,6 +19,7 @@ import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.helper.NetworkHelper;
 import com.dynious.soundscool.network.packet.server.SoundReceivedPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class SoundUploadedPacket implements IMessage
 {
@@ -60,19 +61,22 @@ public class SoundUploadedPacket implements IMessage
         	fileNameChars[i] = bytes.readChar();
         }
         fileName = String.valueOf(fileNameChars);
+        
+        SoundInfo soundInfo = new SoundInfo(title, artist);
 
         File soundFile = NetworkHelper.createFileFromByteArr(NetworkHandler.soundUploaded(title), artist, fileName);
-        SoundHandler.addLocalSound(title, artist, soundFile);
+        Sound sound = new Sound(soundFile);
+        SoundHandler.addLocalSound(soundInfo, sound);
         if (FMLCommonHandler.instance().getEffectiveSide().isClient())
         {
-            DelayedPlayHandler.onSoundReceived(title, artist);
+            DelayedPlayHandler.onSoundReceived(soundInfo);
         }
         else
         {
             EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(artist);
             if (player != null)
             {
-                SoundsCool.network.sendTo(new SoundReceivedPacket(SoundHandler.getSound(title, artist)), player);
+                SoundsCool.network.sendTo(new SoundReceivedPacket(soundInfo), player);
             }
         }
     }
@@ -103,7 +107,7 @@ public class SoundUploadedPacket implements IMessage
         	EntityPlayerMP player = ctx.getServerHandler().playerEntity;
         	int dimension = player.dimension;
         	TargetPoint targetPoint = new TargetPoint(player.dimension, player.posX, player.posY, player.posZ, 8);
-        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new Sound(message.title, message.artist)), targetPoint);
+        	SoundsCool.network.sendToAllAround(new SoundReceivedPacket(new SoundInfo(message.title, message.artist)), targetPoint);
             return null;
         }
     }

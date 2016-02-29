@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.SoundHandler;
-import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class SoundReceivedPacket implements IMessage
 {
@@ -15,10 +15,10 @@ public class SoundReceivedPacket implements IMessage
     {
     }
 
-    public SoundReceivedPacket(Sound sound)
+    public SoundReceivedPacket(SoundInfo soundInfo)
     {
-        this.soundName = sound.getSoundName();
-        this.category = sound.getCategory();
+        this.soundName = soundInfo.name;
+        this.category = soundInfo.category;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class SoundReceivedPacket implements IMessage
         }
         category = String.valueOf(soundCatChars);
 
-        SoundHandler.addRemoteSound(soundName, category);
+        SoundHandler.addRemoteSound(new SoundInfo(soundName, category));
     }
 
     @Override

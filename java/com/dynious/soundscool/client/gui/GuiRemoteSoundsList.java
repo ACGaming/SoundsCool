@@ -7,6 +7,7 @@ import com.dynious.soundscool.SoundsCool;
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.network.packet.client.GetUploadedSoundsPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class GuiRemoteSoundsList extends GuiScrollingList
 {
@@ -67,7 +68,7 @@ public class GuiRemoteSoundsList extends GuiScrollingList
     		if(lastStart < start && !SoundHandler.guiRemoteList.isEmpty())
     			SoundHandler.guiRemoteList.remove(0);
     		else if(lastStart > start && !SoundHandler.guiRemoteList.isEmpty())
-    			SoundHandler.guiRemoteList.add(0, new Sound("",""));
+    			SoundHandler.guiRemoteList.add(0, new Sound(new SoundInfo("","")));
     	}
     	finish = listIndex;
 
@@ -90,7 +91,7 @@ public class GuiRemoteSoundsList extends GuiScrollingList
         
         super.drawScreen(mouseX, mouseY, partialTicks);
         
-    	if(lastStart != start && System.currentTimeMillis() - lastTime > 50)
+    	if((lastStart != start && System.currentTimeMillis() - lastTime > 50) || (System.currentTimeMillis() - lastTime > 1000))
         {
         	SoundsCool.network.sendToServer(new GetUploadedSoundsPacket(start, finish+1));
         	lastStart = start;

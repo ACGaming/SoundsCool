@@ -3,7 +3,6 @@ package com.dynious.soundscool.client.gui;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraftforge.fml.client.GuiScrollingList;
 
-import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.sound.Sound;
 
 public class GuiLocalSoundsList extends GuiScrollingList
@@ -19,7 +18,7 @@ public class GuiLocalSoundsList extends GuiScrollingList
     @Override
     protected int getSize()
     {
-        return SoundHandler.getLocalSounds().size();
+        return parent.getSounds().size();
     }
 
     @Override
@@ -49,7 +48,7 @@ public class GuiLocalSoundsList extends GuiScrollingList
     @Override
     protected void drawSlot(int listIndex, int var2, int var3, int var4, Tessellator var5)
     {
-        Sound sound = SoundHandler.getLocalSounds().get(listIndex);
+        Sound sound = parent.getSounds().get(listIndex);
         if (sound != null)
         {
             this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth(sound.getSoundName(), listWidth - 10), this.left + 3 , var3 + 2, 0xFFFFFF);

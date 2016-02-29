@@ -6,17 +6,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.DelayedPlayHandler;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class SoundNotFoundPacket implements IMessage
 {
-    String soundName;
+    String soundName, category;
     public SoundNotFoundPacket()
     {
     }
 
-    public SoundNotFoundPacket(String soundName)
+    public SoundNotFoundPacket(SoundInfo soundInfo)
     {
-        this.soundName = soundName;
+        this.soundName = soundInfo.name;
+        this.category = soundInfo.category;
     }
 
     @Override
@@ -29,7 +31,16 @@ public class SoundNotFoundPacket implements IMessage
             fileCars[i] = bytes.readChar();
         }
         soundName = String.valueOf(fileCars);
-        DelayedPlayHandler.removeSound(soundName);
+        
+        int catLength = bytes.readInt();
+        char[] catCars = new char[catLength];
+        for (int i = 0; i < catLength; i++)
+        {
+            catCars[i] = bytes.readChar();
+        }
+        category = String.valueOf(catCars);
+        
+        DelayedPlayHandler.removeSound(new SoundInfo(soundName, category));
     }
 
     @Override
@@ -37,6 +48,12 @@ public class SoundNotFoundPacket implements IMessage
     {
         bytes.writeInt(soundName.length());
         for (char c : soundName.toCharArray())
+        {
+            bytes.writeChar(c);
+        }
+        
+        bytes.writeInt(category.length());
+        for (char c : category.toCharArray())
         {
             bytes.writeChar(c);
         }

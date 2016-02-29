@@ -1,12 +1,16 @@
 package com.dynious.soundscool.network.packet.server;
 
 import io.netty.buffer.ByteBuf;
+
+import java.util.ArrayList;
+
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.dynious.soundscool.handler.SoundHandler;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class UploadedSoundsPacket implements IMessage
 {
@@ -44,22 +48,26 @@ public class UploadedSoundsPacket implements IMessage
             {
                 soundCatChars[i] = bytes.readChar();
             }
-            SoundHandler.addRemoteSound(String.valueOf(soundNameCars), String.valueOf(soundCatChars));
-            SoundHandler.guiRemoteList.add(new Sound(String.valueOf(soundNameCars), String.valueOf(soundCatChars)));
+            
+            SoundInfo soundInfo = new SoundInfo(String.valueOf(soundNameCars), String.valueOf(soundCatChars));
+            
+            SoundHandler.addRemoteSound(soundInfo);
+            SoundHandler.guiRemoteList.add(new Sound(soundInfo));
         }
     }
 
     @Override
     public void toBytes(ByteBuf bytes)
     {
-    	int size = SoundHandler.getSounds().size();
+    	int size = SoundHandler.getLocalSounds().size();
     	bytes.writeInt(size);
         bytes.writeInt(start);
-        finish = finish < size ? finish : size-1;
+        finish = finish < size ? finish : size;
         bytes.writeInt(finish);
+        ArrayList<Sound> sounds = new ArrayList(SoundHandler.getLocalSounds().values());
         for (int i=start; i<finish; i++)
         {
-        	Sound sound = SoundHandler.getSounds().get(i);
+        	Sound sound = sounds.get(i);
             bytes.writeInt(sound.getSoundName().length());
             for (char c : sound.getSoundName().toCharArray())
             {

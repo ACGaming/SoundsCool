@@ -98,7 +98,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         if(sounds == null)
         {
         	soundsListGui = new GuiLocalSoundsList(this, getWidth() / 3);
-        	sounds = SoundHandler.getLocalSounds();
+        	sounds = new ArrayList(SoundHandler.getLocalSounds().values());
         }
         else if(soundsListGui.getClass().equals(GuiLocalSoundsList.class))
         {
@@ -106,6 +106,7 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         }
         else
         {
+        	sounds = SoundHandler.guiRemoteList;
         	soundsListGui = new GuiRemoteSoundsList(this, getWidth() / 3);
         	listButton.displayString = "Remote Sounds";
         }
@@ -118,16 +119,19 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         super.drawScreen(p_571_1_, p_571_2_, p_571_3_);
 
         if (selectedSound != null)
-        {
+        {	
         	Sound tileSound = tile.getSelectedSound();
-        	if((!selectedSound.equals(tileSound) && selectedSound.hasRemote()) || (selectedSound.equals(tileSound) && selectedSound.getState()!=tileSound.getState() && tileSound.hasRemote()))
+        	SoundState state = selectedSound.getState();
+        	if(tileSound != null && selectedSound.hasRemote())
         	{
-        		if(tileSound != null)
-        		{
-        			selectedSound = tileSound;
-        		}
+        		selectedSound = tileSound;
         	}
-
+        	
+        	if(selectedSound.hasLocal() && SoundHandler.getRemoteSounds().containsKey(selectedSound.getSoundInfo()))
+        	{
+        		selectedSound.setState(SoundState.SYNCED);
+        	}
+        	
         	String name = selectedSound.getSoundName();
         	this.getFontRenderer().drawString(name, getWidth()/2 + 100 - (this.getFontRenderer().getStringWidth(name)/2), 30, 0xFFFFFF);
 
@@ -154,6 +158,15 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         
         if(tile.isInvalid())
     		this.mc.displayGuiScreen(null);
+        
+        if(listButton.displayString.equals("Local Sounds"))
+    	{
+        	sounds = new ArrayList<Sound>(SoundHandler.getLocalSounds().values());
+    	}
+    	else
+    	{
+    		sounds = SoundHandler.guiRemoteList;
+    	}
     }
     
     private void updateButtons()
@@ -244,31 +257,34 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                     	{
                     		if (selectedSound.getState() == Sound.SoundState.LOCAL_ONLY)
                     		{
-                    			if(SoundHandler.getLocalSounds().contains(selectedSound))
+                    			if(SoundHandler.getLocalSounds().containsKey(selectedSound.getSoundInfo()))
                     			{
-                    				NetworkHelper.clientSoundUpload(selectedSound);
+                    				NetworkHelper.uploadSound(selectedSound);
                     			}
                     			else
                     			{
                     				selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    				NetworkHelper.clientSoundUpload(selectedSound);
+                    				NetworkHelper.uploadSound(selectedSound);
                     			}
-                    			tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
+                    			selectedSound.setState(SoundState.UPLOADING);
+                    			SoundHandler.addLocalSound(selectedSound.getSoundInfo(), selectedSound);
+                    			tile.selectSound(selectedSound.getSoundInfo());
                     			stopSound();
                     			return;
                     		}
                     	}
-                    	else if(!SoundHandler.getLocalSounds().contains(selectedSound))
+                    	else if(!SoundHandler.getLocalSounds().containsKey(selectedSound.getSoundInfo()))
                     	{
                     		selectedSound = SoundHandler.setupSound(selectedSound.getSoundLocation());
-                    		SoundHandler.addLocalSound(selectedSound.getSoundName(), selectedSound.getCategory(), selectedSound.getSoundLocation());
+                    		selectedSound.setState(SoundState.SYNCED);
+                    		SoundHandler.addLocalSound(selectedSound.getSoundInfo(), selectedSound);
 
-                    		tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
+                    		tile.selectSound(selectedSound.getSoundInfo());
                     		stopSound();
                     		return;
                     	}
-
-                    	SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundName(), selectedSound.getCategory()));
+                    	
+                    	SoundsCool.network.sendToServer(new RemoveSoundPacket(selectedSound.getSoundInfo()));
                     	selectedSound.setState(SoundState.LOCAL_ONLY);
                     	SoundHandler.clientRemoveSound(selectedSound, tile.getIdentifier());
                     	selectSoundIndex(-1);
@@ -279,13 +295,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 	{
                 		listButton.displayString = "Remote Sounds";
                 		soundsListGui = new GuiRemoteSoundsList(this, getWidth() / 3);
-                		sounds = SoundHandler.guiRemoteList;
                 	}
                 	else
                 	{
                 		listButton.displayString = "Local Sounds";
                 		soundsListGui = new GuiLocalSoundsList(this, getWidth() / 3);
-                		sounds = SoundHandler.getLocalSounds();
                 	}
             }
     }
@@ -304,21 +318,11 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         }
         if (fcReturn == JFileChooser.APPROVE_OPTION)
         {
-            selectSoundIndex(-1);
+            stopSound();
             selectedSound = new Sound(fileChooser.getSelectedFile());
-            if(!sounds.contains(selectedSound))
+            if(SoundHandler.getRemoteSounds().containsKey(selectedSound.getSoundInfo()))
             {
-            	selectedSound.setCategory(mc.thePlayer.getDisplayName().getUnformattedText());
-            	if(sounds.contains(selectedSound))
-            	{
-            		selectSoundIndex(sounds.indexOf(selectedSound));
-            	}
-            	else
-            		playSound();
-            }
-            else
-            {
-            	selectSoundIndex(sounds.indexOf(selectedSound));
+            	tile.selectSound(selectedSound.getSoundInfo());
             }
         }
     }
@@ -367,8 +371,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
         if (selected >= 0 && selected < sounds.size())
         {
         	selectedSound = sounds.get(selected); 	
-        	tile.selectSound(selectedSound.getSoundName(), selectedSound.getCategory());
-        	SoundsCool.network.sendToServer(new CheckPresencePacket(selectedSound.getSoundName(), selectedSound.getCategory(), false));
+        	tile.selectSound(selectedSound.getSoundInfo());
+        	SoundsCool.network.sendToServer(new CheckPresencePacket(selectedSound.getSoundInfo(), false));
         }
         else
         	selectedSound = null;
@@ -378,6 +382,12 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
     public boolean soundIndexSelected(int var1)
     {
     	return sounds.indexOf(selectedSound) == var1;
+    }
+    
+    @Override
+    public ArrayList<Sound> getSounds()
+    {
+    	return sounds;
     }
 
     @Override

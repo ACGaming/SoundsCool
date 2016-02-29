@@ -19,6 +19,7 @@ import com.dynious.soundscool.network.packet.server.ServerPlaySoundPacket;
 import com.dynious.soundscool.network.packet.server.SoundRemovedPacket;
 import com.dynious.soundscool.network.packet.server.StopSoundPacket;
 import com.dynious.soundscool.sound.Sound;
+import com.dynious.soundscool.sound.SoundInfo;
 
 public class TileSoundPlayer extends TileEntity implements ITickable
 {
@@ -41,21 +42,24 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         }
     }
 
-    public void selectSound(String soundName, String category)
+    public void selectSound(SoundInfo soundInfo)
     {
-        this.selectedSound = SoundHandler.getSound(soundName, category);
+        this.selectedSound = SoundHandler.getSound(soundInfo);
 
         if (worldObj.isRemote)
         {
         	SoundsCool.network.sendToServer(new SoundPlayerSelectPacket(this));
         }
-        sync();
+        else
+        {
+        	sync();
+        }
     }
 
     public Sound getSelectedSound()
     {
     	if(selectedSound != null)
-    		return SoundHandler.getSound(selectedSound.getSoundName(), selectedSound.getCategory());
+    		return SoundHandler.getSound(new SoundInfo(selectedSound.getSoundName(), selectedSound.getCategory()));
     	else
     		return null;
     }
@@ -66,12 +70,12 @@ public class TileSoundPlayer extends TileEntity implements ITickable
         {
             if (!isPlaying())
             {
-                if (SoundHandler.getSounds().contains(selectedSound))
+                if (SoundHandler.getLocalSounds().containsKey(selectedSound.getSoundInfo()))
                 {
                     lastSoundIdentifier = UUID.randomUUID().toString();
                     timeSoundFinishedPlaying = (long)(SoundHelper.getSoundLength(selectedSound.getSoundLocation())*1000) + System.currentTimeMillis();
                     TargetPoint tp = new TargetPoint(getWorld().provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 64);
-                    SoundsCool.network.sendToAllAround(new ServerPlaySoundPacket(selectedSound.getSoundName(), selectedSound.getCategory(), lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()), tp);
+                    SoundsCool.network.sendToAllAround(new ServerPlaySoundPacket(selectedSound.getSoundInfo(), lastSoundIdentifier, pos.getX(), pos.getY(), pos.getZ()), tp);
                 }
                 else
                 {
@@ -128,7 +132,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
 		}
     	else if(count == 0)
     	{
-    		if(selectedSound != null && !SoundHandler.getSounds().contains(selectedSound))
+    		if(selectedSound != null && !SoundHandler.getLocalSounds().containsKey(selectedSound.getSoundInfo()))
     		{
     			TargetPoint targetPoint = new TargetPoint(worldObj.provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), 8);
                 SoundsCool.network.sendToAllAround(new SoundRemovedPacket(selectedSound.getSoundName(), selectedSound.getCategory()), targetPoint);
@@ -167,7 +171,7 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        selectedSound = SoundHandler.getSound(compound.getString("name"), compound.getString("category"));
+        selectedSound = SoundHandler.getSound(new SoundInfo(compound.getString("name"), compound.getString("category")));
         lastSoundIdentifier = compound.getString("lastSoundIdentifier");
         timeSoundFinishedPlaying = compound.getLong("timeSoundFinishedPlaying");
     }
@@ -190,17 +194,18 @@ public class TileSoundPlayer extends TileEntity implements ITickable
     {
         String soundName = pkt.getNbtCompound().getString("name");
         String category = pkt.getNbtCompound().getString("category");
+        SoundInfo soundInfo = new SoundInfo(soundName, category);
         
-        if((selectedSound != null && !selectedSound.equals(new Sound(soundName, category))) || selectedSound == null)
+        if((selectedSound != null && !selectedSound.getSoundInfo().equals(soundInfo)) || selectedSound == null)
         {
-        	selectedSound = SoundHandler.getSound(soundName, category);
+        	selectedSound = SoundHandler.getLocalSounds().get(soundInfo);
         	if(soundName.length() != 0 && category.length() != 0)
         	{
         		if(selectedSound == null)
         		{
-        			selectedSound = new Sound(soundName, category);
+        			selectedSound = new Sound(soundInfo);
         		}
-        		SoundHandler.addRemoteSound(soundName, category);
+        		SoundHandler.addRemoteSound(soundInfo);
         	}
         }
         

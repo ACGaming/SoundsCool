@@ -28,7 +28,7 @@ public class SoundHelper
         {
             e.printStackTrace();
         }
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     public static boolean isSoundInSoundsFolder(File soundFile)

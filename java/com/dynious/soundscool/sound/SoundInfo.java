@@ -1,6 +1,6 @@
 package com.dynious.soundscool.sound;
 
-public class SoundInfo {
+public class SoundInfo implements Comparable{
 	public String name, category;
 	
 	public SoundInfo(String name, String category){
@@ -38,5 +38,23 @@ public class SoundInfo {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Object obj) {
+		if(obj == null)
+			throw new NullPointerException();
+		if(this == obj)
+			return 0;
+
+		SoundInfo other = (SoundInfo) obj;
+		int nameCompared = this.name.compareToIgnoreCase(other.name);
+
+		if(nameCompared == 0)
+		{
+			return this.category.compareToIgnoreCase(other.category);
+		}
+
+		return nameCompared;
 	}
 }
