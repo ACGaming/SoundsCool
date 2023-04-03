@@ -1,0 +1,13 @@
+[
+  {
+    "modid": "soundscool",
+    "name": "Sounds Cool",
+    "description": "A Minecraft mod all about sounds!",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://github.com/ACGaming/SoundsCool",
+    "authors": ["Dynious", "zoonie", "ACGaming"],
+    "credits": "Dynious and the Forge/MCP crew!",
+    "logoFile": "logo.png"
+  }
+]

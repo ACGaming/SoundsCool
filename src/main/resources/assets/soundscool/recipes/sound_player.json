@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "soundscool:sound_player"
+  },
+  "pattern": [
+    "IRI",
+    "RJR",
+    "IRI"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "J": {
+      "item": "minecraft:jukebox"
+    }
+  }
+}

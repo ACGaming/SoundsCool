@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "soundscool:sound_player"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}
