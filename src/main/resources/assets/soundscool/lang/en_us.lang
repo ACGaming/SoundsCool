@@ -3,3 +3,15 @@ tile.soundscool.sound_player.name=Sound Player
 
 # CREATIVE TAB
 itemGroup.soundscool=Sounds Cool
+
+# GUI
+gui.soundscool.local_sounds=Local Sounds
+gui.soundscool.remote_sounds=Remote Sounds
+gui.soundscool.play_sound=Play Sound
+gui.soundscool.stop_sound=Stop Sound
+gui.soundscool.preview_sound=Preview Sound
+gui.soundscool.select_file=Select File
+gui.soundscool.upload=Upload
+gui.soundscool.upload_and_save=Upload and Save
+gui.soundscool.save=Save
+gui.soundscool.delete=Delete

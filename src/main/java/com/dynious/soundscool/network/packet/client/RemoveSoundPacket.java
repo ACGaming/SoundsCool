@@ -36,7 +36,6 @@ public class RemoveSoundPacket implements IMessage
 
         Sound sound = SoundHandler.getSound(new SoundInfo(soundName, category));
         SoundHandler.removeSound(sound);
-
     }
 
     @Override
