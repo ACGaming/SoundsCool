@@ -48,6 +48,6 @@ public class ClientProxy extends CommonProxy
     @Override
     public void registerModels()
     {
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getByNameOrId(Reference.modid + ":" + Names.soundPlayer), 0, new ModelResourceLocation(Reference.modid + ":" + Names.soundPlayer, "inventory"));
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getByNameOrId(Reference.namespace + Names.soundPlayer), 0, new ModelResourceLocation(Reference.namespace + Names.soundPlayer, "inventory"));
     }
 }

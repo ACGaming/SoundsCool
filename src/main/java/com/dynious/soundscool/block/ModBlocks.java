@@ -9,6 +9,6 @@ import com.dynious.soundscool.lib.Reference;
 @Mod.EventBusSubscriber
 public class ModBlocks
 {
-    @GameRegistry.ObjectHolder(Reference.modid + ":" + Names.soundPlayer)
+    @GameRegistry.ObjectHolder(Reference.namespace + Names.soundPlayer)
     public static BlockSoundPlayer soundPlayer;
 }
