@@ -282,7 +282,8 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
                 if (selectedSound.hasRemote())
                 {
                     uploadButton.displayString = "Delete";
-                    uploadButton.enabled = selectedSound.getCategory().equals(mc.player.getDisplayName().getUnformattedText());
+                    //uploadButton.enabled = selectedSound.getCategory().equals(mc.player.getDisplayName().getUnformattedText());
+                    uploadButton.enabled = false;
                 }
                 else
                 {
@@ -292,9 +293,16 @@ public class GuiSoundPlayer extends GuiScreen implements IListGui
             }
             else
             {
-                if (selectedSound.getState() == SoundState.SYNCED) uploadButton.displayString = "Delete";
-                else uploadButton.displayString = "Save";
-                uploadButton.enabled = true;
+                if (selectedSound.getState() == SoundState.SYNCED)
+                {
+                    uploadButton.displayString = "Delete";
+                    uploadButton.enabled = false;
+                }
+                else
+                {
+                    uploadButton.displayString = "Save";
+                    uploadButton.enabled = true;
+                }
             }
 
             if (tile.isPlaying() || System.currentTimeMillis() < timeSoundFinishedPlaying) playButton.displayString = "Stop Sound";
