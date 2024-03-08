@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.dynious.soundscool.handler.ConfigHandler;
 import paulscode.sound.SoundSystem;
 
 @SideOnly(Side.CLIENT)
@@ -40,7 +41,7 @@ public class SoundPlayer
     {
         try
         {
-            soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, 16);
+            soundSystem.newStreamingSource(false, identifier, sound.toURI().toURL(), sound.getName(), false, x, y, z, fading ? 2 : 0, ConfigHandler.fadingDistance);
             soundSystem.play(identifier);
             playing.add(identifier);
         }
